@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prompt Optimizer | Simulator Mindset</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0a0a0b;
+      --bg-secondary: #111113;
+      --bg-card: #18181b;
+      --bg-input: #0f0f10;
+      --border: #27272a;
+      --border-focus: #3f3f46;
+      --text-primary: #fafafa;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --accent: #f97316;
+      --accent-hover: #fb923c;
+      --accent-soft: rgba(249, 115, 22, 0.12);
+      --accent-glow: rgba(249, 115, 22, 0.25);
+      --success: #22c55e;
+      --success-soft: rgba(34, 197, 94, 0.12);
+      --purple: #a855f7;
+      --purple-soft: rgba(168, 85, 247, 0.12);
+      --blue: #3b82f6;
+      --blue-soft: rgba(59, 130, 246, 0.12);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Manrope', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 2rem;
+      background-image: 
+        radial-gradient(ellipse 80% 50% at 50% -20%, var(--accent-soft), transparent),
+        radial-gradient(circle at 100% 100%, rgba(249, 115, 22, 0.05), transparent 40%);
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    header {
+      margin-bottom: 3rem;
+      text-align: center;
+    }
+
+    .overline {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .overline::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.9); }
+    }
+
+    h1 {
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 400;
+      line-height: 1.1;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.02em;
+    }
+
+    h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      font-weight: 300;
+    }
+
+    /* Main Layout */
+    .optimizer-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .optimizer-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Panels */
+    .panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .panel-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .panel-title {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .panel-title .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .input-panel .panel-title .dot {
+      background: var(--blue);
+    }
+
+    .output-panel .panel-title .dot {
+      background: var(--success);
+    }
+
+    .char-count {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .panel-body {
+      flex: 1;
+      padding: 1rem;
+      min-height: 300px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100%;
+      min-height: 280px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.875rem;
+      color: var(--text-primary);
+      resize: none;
+      transition: border-color 0.2s ease;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    textarea::placeholder {
+      color: var(--text-muted);
+    }
+
+    /* Output Display */
+    .output-content {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      min-height: 280px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .output-content.has-content {
+      color: var(--text-primary);
+    }
+
+    .output-content .placeholder {
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    /* Optimized Prompt Sections */
+    .optimized-section {
+      margin-bottom: 1.25rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .optimized-section:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .optimized-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .optimized-text {
+      color: var(--text-primary);
+      line-height: 1.7;
+    }
+
+    /* Action Bar */
+    .action-bar {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      font-family: 'Manrope', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      padding: 0.875rem 1.75rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--bg-primary);
+      border: none;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--text-muted);
+      color: var(--text-primary);
+    }
+
+    /* Loading State */
+    .loading {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Methodology Reference */
+    .methodology {
+      margin-top: 3rem;
+      padding: 1.5rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    .methodology-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      cursor: pointer;
+    }
+
+    .methodology-title {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .methodology-toggle {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      transition: transform 0.2s ease;
+    }
+
+    .methodology.collapsed .methodology-toggle {
+      transform: rotate(-90deg);
+    }
+
+    .methodology.collapsed .methodology-content {
+      display: none;
+    }
+
+    .methodology-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .method-item {
+      padding: 0.75rem;
+      background: var(--bg-card);
+      border-radius: 6px;
+      border-left: 2px solid var(--border);
+      transition: border-color 0.2s ease;
+    }
+
+    .method-item:hover {
+      border-left-color: var(--accent);
+    }
+
+    .method-item h4 {
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .method-item p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Copy Success Toast */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--success);
+      color: var(--bg-primary);
+      padding: 0.75rem 1.25rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 100;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* Footer */
+    footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .footer-text {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .footer-text a {
+      color: var(--text-secondary);
+      text-decoration: none;
+    }
+
+    .footer-text a:hover {
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="overline">Prompt Engineering Tool</div>
+      <h1>Prompt <em>Optimizer</em></h1>
+      <p class="subtitle">Transform basic prompts using the simulator mindset methodology</p>
+    </header>
+
+    <div class="optimizer-layout">
+      <div class="panel input-panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span class="dot"></span>
+            Your Prompt
+          </div>
+          <span class="char-count"><span id="charCount">0</span> chars</span>
+        </div>
+        <div class="panel-body">
+          <textarea 
+            id="inputPrompt" 
+            placeholder="Enter your prompt here...
+
+Example: &quot;What do you think about remote work?&quot;"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="panel output-panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span class="dot"></span>
+            Optimized Prompt
+          </div>
+          <button class="btn-secondary btn" id="copyBtn" style="padding: 0.4rem 0.75rem; font-size: 0.75rem; display: none;">
+            Copy
+          </button>
+        </div>
+        <div class="panel-body">
+          <div class="output-content" id="outputContent">
+            <span class="placeholder">Your optimized prompt will appear here...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="action-bar">
+      <button class="btn btn-secondary" id="clearBtn">Clear</button>
+      <button class="btn btn-primary" id="optimizeBtn">
+        <span id="btnText">Optimize Prompt</span>
+      </button>
+    </div>
+
+    <div class="methodology" id="methodology">
+      <div class="methodology-header" onclick="toggleMethodology()">
+        <span class="methodology-title">Methodology Reference</span>
+        <span class="methodology-toggle">▼</span>
+      </div>
+      <div class="methodology-content">
+        <div class="methodology-grid">
+          <div class="method-item">
+            <h4>Summon Perspectives</h4>
+            <p>Ask how specific experts would view the problem</p>
+          </div>
+          <div class="method-item">
+            <h4>Stage Debates</h4>
+            <p>Simulate conversations between advocates and critics</p>
+          </div>
+          <div class="method-item">
+            <h4>Multiple Framings</h4>
+            <p>Request explanations for different audiences</p>
+          </div>
+          <div class="method-item">
+            <h4>Name Failure Modes</h4>
+            <p>Ask what skeptics or auditors would flag</p>
+          </div>
+          <div class="method-item">
+            <h4>Iterate When Flat</h4>
+            <p>Push for non-obvious angles and expert insights</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p class="footer-text">
+        Built on the <a href="#">Simulator Mindset</a> · Inspired by <a href="https://twitter.com/karpathy" target="_blank">@karpathy</a>
+      </p>
+    </footer>
+  </div>
+
+  <div class="toast" id="toast">Copied to clipboard!</div>
+
+  <script>
+    const inputPrompt = document.getElementById('inputPrompt');
+    const outputContent = document.getElementById('outputContent');
+    const optimizeBtn = document.getElementById('optimizeBtn');
+    const btnText = document.getElementById('btnText');
+    const clearBtn = document.getElementById('clearBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const charCount = document.getElementById('charCount');
+    const toast = document.getElementById('toast');
+
+    let optimizedText = '';
+
+    // Character count
+    inputPrompt.addEventListener('input', () => {
+      charCount.textContent = inputPrompt.value.length;
+    });
+
+    // Clear button
+    clearBtn.addEventListener('click', () => {
+      inputPrompt.value = '';
+      charCount.textContent = '0';
+      outputContent.innerHTML = '<span class="placeholder">Your optimized prompt will appear here...</span>';
+      outputContent.classList.remove('has-content');
+      copyBtn.style.display = 'none';
+      optimizedText = '';
+    });
+
+    // Copy button
+    copyBtn.addEventListener('click', async () => {
+      if (optimizedText) {
+        await navigator.clipboard.writeText(optimizedText);
+        showToast();
+      }
+    });
+
+    function showToast() {
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    // Toggle methodology
+    function toggleMethodology() {
+      document.getElementById('methodology').classList.toggle('collapsed');
+    }
+
+    // Optimize prompt
+    optimizeBtn.addEventListener('click', async () => {
+      const prompt = inputPrompt.value.trim();
+      
+      if (!prompt) {
+        inputPrompt.focus();
+        return;
+      }
+
+      // Set loading state
+      optimizeBtn.disabled = true;
+      btnText.innerHTML = '<span class="spinner"></span> Optimizing...';
+      outputContent.innerHTML = '<div class="loading"><span class="spinner"></span> Analyzing and optimizing your prompt...</div>';
+
+      try {
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 1000,
+            messages: [
+              {
+                role: 'user',
+                content: `You are a prompt optimization expert using the "Simulator Mindset" methodology. Your job is to transform basic prompts into more effective ones.
+
+THE SIMULATOR MINDSET:
+An LLM isn't a person with opinions—it's a simulator that can channel many perspectives. "You" activates a default persona, but there are more powerful approaches.
+
+TECHNIQUES TO APPLY:
+1. Summon Specific Perspectives - Instead of "what do you think", ask how specific experts would view it
+2. Stage Debates - Simulate conversations between advocates and critics
+3. Request Multiple Framings - Get explanations for different audiences or viewpoints
+4. Name Failure Modes - Ask what skeptics, auditors, or critics would flag
+5. Iterate for Depth - Push for non-obvious angles and expert-level insights
+
+YOUR TASK:
+Take the user's original prompt and create an optimized version that applies these principles. The optimized prompt should:
+- Be specific about whose perspective to simulate
+- Request multiple viewpoints when valuable
+- Ask for potential criticisms or blind spots
+- Be clear and actionable
+
+Respond in this exact format (no markdown, just plain text with these labels):
+
+ORIGINAL ANALYSIS:
+[1-2 sentences on what's weak about the original prompt]
+
+OPTIMIZED PROMPT:
+[The improved prompt - this is the main output]
+
+WHY IT'S BETTER:
+[1-2 sentences on which techniques were applied]
+
+---
+
+USER'S ORIGINAL PROMPT:
+"${prompt}"`
+              }
+            ]
+          })
+        });
+
+        const data = await response.json();
+        const result = data.content[0].text;
+
+        // Parse the response
+        const sections = parseResponse(result);
+        
+        // Store the optimized prompt for copying
+        optimizedText = sections.optimized || result;
+
+        // Display formatted output
+        outputContent.innerHTML = formatOutput(sections);
+        outputContent.classList.add('has-content');
+        copyBtn.style.display = 'block';
+
+      } catch (error) {
+        console.error('Error:', error);
+        outputContent.innerHTML = `<span class="placeholder" style="color: #ef4444;">Error optimizing prompt. Please try again.</span>`;
+      } finally {
+        optimizeBtn.disabled = false;
+        btnText.textContent = 'Optimize Prompt';
+      }
+    });
+
+    function parseResponse(text) {
+      const sections = {
+        analysis: '',
+        optimized: '',
+        why: ''
+      };
+
+      // Extract sections using regex
+      const analysisMatch = text.match(/ORIGINAL ANALYSIS:\s*([\s\S]*?)(?=OPTIMIZED PROMPT:|$)/i);
+      const optimizedMatch = text.match(/OPTIMIZED PROMPT:\s*([\s\S]*?)(?=WHY IT'S BETTER:|$)/i);
+      const whyMatch = text.match(/WHY IT'S BETTER:\s*([\s\S]*?)$/i);
+
+      if (analysisMatch) sections.analysis = analysisMatch[1].trim();
+      if (optimizedMatch) sections.optimized = optimizedMatch[1].trim();
+      if (whyMatch) sections.why = whyMatch[1].trim();
+
+      return sections;
+    }
+
+    function formatOutput(sections) {
+      if (!sections.optimized) {
+        return '<span class="placeholder">Could not parse response. Please try again.</span>';
+      }
+
+      return `
+<div class="optimized-section">
+  <span class="optimized-label">Analysis</span>
+  <div class="optimized-text">${escapeHtml(sections.analysis)}</div>
+</div>
+<div class="optimized-section">
+  <span class="optimized-label" style="color: var(--success);">Optimized Prompt</span>
+  <div class="optimized-text">${escapeHtml(sections.optimized)}</div>
+</div>
+<div class="optimized-section">
+  <span class="optimized-label" style="color: var(--purple);">Why It's Better</span>
+  <div class="optimized-text">${escapeHtml(sections.why)}</div>
+</div>
+      `;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>
