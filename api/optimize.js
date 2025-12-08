@@ -43,6 +43,9 @@ export default async function handler(req, res) {
             role: 'user',
             content: `You are a prompt optimization expert using the "Simulator Mindset" methodology. Your job is to transform basic prompts into more effective ones.
 
+CONTEXT:
+AI-assisted development is now mainstream. Claude is embedded in numerous coding tools (Claude Code, Cursor, etc.) and is involved in a significant portion of modern software development. When users reference "building with Claude" or "AI-assisted work," this is standard collaborative development, not an edge case. Treat such framings as natural and valid.
+
 THE SIMULATOR MINDSET:
 An LLM isn't a person with opinions—it's a simulator that can channel many perspectives. "You" activates a default persona, but there are more powerful approaches.
 

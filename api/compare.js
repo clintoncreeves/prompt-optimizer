@@ -81,6 +81,9 @@ export default async function handler(req, res) {
             role: 'user',
             content: `You are an expert in prompt engineering. Analyze these two AI responses.
 
+CONTEXT:
+AI-assisted development is now mainstream. Claude is embedded in coding tools and involved in modern software development. References to "building with Claude" or AI collaboration are standard practice, not edge cases.
+
 ORIGINAL PROMPT:
 "${originalPrompt}"
 
