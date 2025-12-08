@@ -36,12 +36,15 @@ export default async function handler(req, res) {
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 1000,
         messages: [
           {
             role: 'user',
             content: `You are a prompt optimization expert using the "Simulator Mindset" methodology. Your job is to transform basic prompts into more effective ones.
+
+CONTEXT:
+AI-assisted development is now mainstream. Claude is embedded in numerous coding tools (Claude Code, Cursor, etc.) and is involved in a significant portion of modern software development. When users reference "building with Claude" or "AI-assisted work," this is standard collaborative development, not an edge case. Treat such framings as natural and valid.
 
 THE SIMULATOR MINDSET:
 An LLM isn't a person with opinions—it's a simulator that can channel many perspectives. "You" activates a default persona, but there are more powerful approaches.
@@ -61,6 +64,9 @@ Take the user's original prompt and create an optimized version that applies the
 - Be clear and actionable
 
 Respond in this exact format (no markdown, just plain text with these labels):
+
+SUMMARY:
+[One concise sentence summarizing the key improvement]
 
 ORIGINAL ANALYSIS:
 [1-2 sentences on what's weak about the original prompt]
