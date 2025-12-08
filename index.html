@@ -322,7 +322,7 @@
 
     /* Methodology Reference */
     .methodology {
-      margin-top: 3rem;
+      margin-bottom: 2rem;
       padding: 1.5rem;
       background: var(--bg-secondary);
       border: 1px solid var(--border);
@@ -330,11 +330,7 @@
     }
 
     .methodology-header {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
       margin-bottom: 1rem;
-      cursor: pointer;
     }
 
     .methodology-title {
@@ -346,24 +342,22 @@
       color: var(--text-muted);
     }
 
-    .methodology-toggle {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      transition: transform 0.2s ease;
-    }
-
-    .methodology.collapsed .methodology-toggle {
-      transform: rotate(-90deg);
-    }
-
-    .methodology.collapsed .methodology-content {
-      display: none;
-    }
-
     .methodology-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: 1rem;
+    }
+
+    @media (max-width: 900px) {
+      .methodology-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .methodology-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     .method-item {
@@ -442,6 +436,36 @@
       <p class="subtitle">Transform basic prompts using the simulator mindset methodology</p>
     </header>
 
+    <div class="methodology" id="methodology">
+      <div class="methodology-header">
+        <span class="methodology-title">The Simulator Mindset</span>
+      </div>
+      <div class="methodology-content">
+        <div class="methodology-grid">
+          <div class="method-item">
+            <h4>Summon Perspectives</h4>
+            <p>Ask how specific experts would view the problem</p>
+          </div>
+          <div class="method-item">
+            <h4>Stage Debates</h4>
+            <p>Simulate conversations between advocates and critics</p>
+          </div>
+          <div class="method-item">
+            <h4>Multiple Framings</h4>
+            <p>Request explanations for different audiences</p>
+          </div>
+          <div class="method-item">
+            <h4>Name Failure Modes</h4>
+            <p>Ask what skeptics or auditors would flag</p>
+          </div>
+          <div class="method-item">
+            <h4>Iterate When Flat</h4>
+            <p>Push for non-obvious angles and expert insights</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="optimizer-layout">
       <div class="panel input-panel">
         <div class="panel-header">
@@ -486,37 +510,6 @@ Example: &quot;What do you think about remote work?&quot;"
       </button>
     </div>
 
-    <div class="methodology" id="methodology">
-      <div class="methodology-header" onclick="toggleMethodology()">
-        <span class="methodology-title">Methodology Reference</span>
-        <span class="methodology-toggle">▼</span>
-      </div>
-      <div class="methodology-content">
-        <div class="methodology-grid">
-          <div class="method-item">
-            <h4>Summon Perspectives</h4>
-            <p>Ask how specific experts would view the problem</p>
-          </div>
-          <div class="method-item">
-            <h4>Stage Debates</h4>
-            <p>Simulate conversations between advocates and critics</p>
-          </div>
-          <div class="method-item">
-            <h4>Multiple Framings</h4>
-            <p>Request explanations for different audiences</p>
-          </div>
-          <div class="method-item">
-            <h4>Name Failure Modes</h4>
-            <p>Ask what skeptics or auditors would flag</p>
-          </div>
-          <div class="method-item">
-            <h4>Iterate When Flat</h4>
-            <p>Push for non-obvious angles and expert insights</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <footer>
       <p class="footer-text">
         Built on the <a href="#">Simulator Mindset</a> · Inspired by <a href="https://twitter.com/karpathy" target="_blank">@karpathy</a>
@@ -543,6 +536,14 @@ Example: &quot;What do you think about remote work?&quot;"
       charCount.textContent = inputPrompt.value.length;
     });
 
+    // Enter key to optimize (Shift+Enter for new line)
+    inputPrompt.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        optimizeBtn.click();
+      }
+    });
+
     // Clear button
     clearBtn.addEventListener('click', () => {
       inputPrompt.value = '';
@@ -564,11 +565,6 @@ Example: &quot;What do you think about remote work?&quot;"
     function showToast() {
       toast.classList.add('show');
       setTimeout(() => toast.classList.remove('show'), 2000);
-    }
-
-    // Toggle methodology
-    function toggleMethodology() {
-      document.getElementById('methodology').classList.toggle('collapsed');
     }
 
     // Optimize prompt
