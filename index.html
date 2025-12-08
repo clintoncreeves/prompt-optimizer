@@ -108,12 +108,12 @@
     /* Main Layout */
     .optimizer-layout {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
       gap: 1.5rem;
       margin-bottom: 2rem;
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 1200px) {
       .optimizer-layout {
         grid-template-columns: 1fr;
       }
@@ -161,6 +161,10 @@
 
     .output-panel .panel-title .dot {
       background: var(--success);
+    }
+
+    .comparison-panel .panel-title .dot {
+      background: var(--purple);
     }
 
     .char-count {
@@ -225,8 +229,8 @@
 
     /* Optimized Prompt Sections */
     .optimized-section {
-      margin-bottom: 1.25rem;
-      padding-bottom: 1.25rem;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.75rem;
       border-bottom: 1px solid var(--border);
     }
 
@@ -242,13 +246,53 @@
       letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--accent);
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.35rem;
       display: block;
     }
 
     .optimized-text {
       color: var(--text-primary);
       line-height: 1.7;
+    }
+
+    /* Comparison Panel Sections */
+    .comparison-subsection {
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .comparison-subsection:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .comparison-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .comparison-label.original {
+      color: var(--text-muted);
+    }
+
+    .comparison-label.optimized {
+      color: var(--success);
+    }
+
+    .comparison-label.analysis {
+      color: var(--purple);
+    }
+
+    .comparison-text {
+      color: var(--text-secondary);
+      line-height: 1.6;
+      font-size: 0.85rem;
     }
 
     /* Action Bar */
@@ -501,6 +545,20 @@ Example: &quot;What do you think about remote work?&quot;"
           </div>
         </div>
       </div>
+
+      <div class="panel comparison-panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span class="dot"></span>
+            Output Comparison
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="output-content" id="comparisonContent">
+            <span class="placeholder">Output comparison will appear here after optimization...</span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="action-bar">
@@ -522,6 +580,7 @@ Example: &quot;What do you think about remote work?&quot;"
   <script>
     const inputPrompt = document.getElementById('inputPrompt');
     const outputContent = document.getElementById('outputContent');
+    const comparisonContent = document.getElementById('comparisonContent');
     const optimizeBtn = document.getElementById('optimizeBtn');
     const btnText = document.getElementById('btnText');
     const clearBtn = document.getElementById('clearBtn');
@@ -530,6 +589,7 @@ Example: &quot;What do you think about remote work?&quot;"
     const toast = document.getElementById('toast');
 
     let optimizedText = '';
+    let optimizedPromptText = '';
 
     // Character count
     inputPrompt.addEventListener('input', () => {
@@ -550,8 +610,11 @@ Example: &quot;What do you think about remote work?&quot;"
       charCount.textContent = '0';
       outputContent.innerHTML = '<span class="placeholder">Your optimized prompt will appear here...</span>';
       outputContent.classList.remove('has-content');
+      comparisonContent.innerHTML = '<span class="placeholder">Output comparison will appear here after optimization...</span>';
+      comparisonContent.classList.remove('has-content');
       copyBtn.style.display = 'none';
       optimizedText = '';
+      optimizedPromptText = '';
     });
 
     // Copy button
@@ -580,8 +643,10 @@ Example: &quot;What do you think about remote work?&quot;"
       optimizeBtn.disabled = true;
       btnText.innerHTML = '<span class="spinner"></span> Optimizing...';
       outputContent.innerHTML = '<div class="loading"><span class="spinner"></span> Analyzing and optimizing your prompt...</div>';
+      comparisonContent.innerHTML = '<div class="loading"><span class="spinner"></span> Waiting for optimization...</div>';
 
       try {
+        // Step 1: Optimize the prompt
         const response = await fetch('/api/optimize', {
           method: 'POST',
           headers: {
@@ -603,19 +668,45 @@ Example: &quot;What do you think about remote work?&quot;"
 
         // Parse the response
         const sections = parseResponse(result);
-        
-        // Store the optimized prompt for copying
+
+        // Store the optimized prompt for copying and comparison
         optimizedText = sections.optimized || result;
+        optimizedPromptText = optimizedText;
 
         // Display formatted output
         outputContent.innerHTML = formatOutput(sections);
         outputContent.classList.add('has-content');
         copyBtn.style.display = 'block';
 
+        // Step 2: Generate comparison
+        comparisonContent.innerHTML = '<div class="loading"><span class="spinner"></span> Generating output comparison...</div>';
+
+        const comparisonResponse = await fetch('/api/compare', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            originalPrompt: prompt,
+            optimizedPrompt: optimizedPromptText
+          })
+        });
+
+        const comparisonData = await comparisonResponse.json();
+
+        if (!comparisonResponse.ok) {
+          throw new Error(comparisonData.error || 'Failed to generate comparison');
+        }
+
+        // Display comparison
+        comparisonContent.innerHTML = formatComparison(comparisonData);
+        comparisonContent.classList.add('has-content');
+
       } catch (error) {
         console.error('Error:', error);
         const errorMessage = error.message || 'Error optimizing prompt. Please try again.';
         outputContent.innerHTML = `<span class="placeholder" style="color: #ef4444;">${escapeHtml(errorMessage)}</span>`;
+        comparisonContent.innerHTML = `<span class="placeholder" style="color: #ef4444;">Comparison unavailable due to error.</span>`;
       } finally {
         optimizeBtn.disabled = false;
         btnText.textContent = 'Optimize Prompt';
@@ -658,6 +749,27 @@ Example: &quot;What do you think about remote work?&quot;"
 <div class="optimized-section">
   <span class="optimized-label" style="color: var(--purple);">Why It's Better</span>
   <div class="optimized-text">${escapeHtml(sections.why)}</div>
+</div>
+      `;
+    }
+
+    function formatComparison(data) {
+      if (!data.originalOutput || !data.optimizedOutput || !data.analysis) {
+        return '<span class="placeholder">Could not generate comparison. Please try again.</span>';
+      }
+
+      return `
+<div class="comparison-subsection">
+  <span class="comparison-label original">Your Prompt Output</span>
+  <div class="comparison-text">${escapeHtml(data.originalOutput)}</div>
+</div>
+<div class="comparison-subsection">
+  <span class="comparison-label optimized">Optimized Prompt Output</span>
+  <div class="comparison-text">${escapeHtml(data.optimizedOutput)}</div>
+</div>
+<div class="comparison-subsection">
+  <span class="comparison-label analysis">Why The Optimized Output Is Better</span>
+  <div class="comparison-text">${escapeHtml(data.analysis)}</div>
 </div>
       `;
     }
