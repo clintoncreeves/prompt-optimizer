@@ -229,8 +229,8 @@
 
     /* Optimized Prompt Sections */
     .optimized-section {
-      margin-bottom: 0.75rem;
-      padding-bottom: 0.75rem;
+      margin-bottom: 0.5rem;
+      padding-bottom: 0.5rem;
       border-bottom: 1px solid var(--border);
     }
 
@@ -246,7 +246,7 @@
       letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--accent);
-      margin-bottom: 0.35rem;
+      margin-bottom: 0.25rem;
       display: block;
     }
 
@@ -257,8 +257,8 @@
 
     /* Comparison Panel Sections */
     .comparison-subsection {
-      margin-bottom: 1rem;
-      padding-bottom: 1rem;
+      margin-bottom: 0.5rem;
+      padding-bottom: 0.5rem;
       border-bottom: 1px solid var(--border);
     }
 
@@ -273,7 +273,7 @@
       font-weight: 600;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.25rem;
       display: block;
     }
 
@@ -552,6 +552,9 @@ Example: &quot;What do you think about remote work?&quot;"
             <span class="dot"></span>
             Output Comparison
           </div>
+          <button class="btn-secondary btn" id="copyComparisonBtn" style="padding: 0.4rem 0.75rem; font-size: 0.75rem; display: none;">
+            Copy
+          </button>
         </div>
         <div class="panel-body">
           <div class="output-content" id="comparisonContent">
@@ -585,11 +588,13 @@ Example: &quot;What do you think about remote work?&quot;"
     const btnText = document.getElementById('btnText');
     const clearBtn = document.getElementById('clearBtn');
     const copyBtn = document.getElementById('copyBtn');
+    const copyComparisonBtn = document.getElementById('copyComparisonBtn');
     const charCount = document.getElementById('charCount');
     const toast = document.getElementById('toast');
 
     let optimizedText = '';
     let optimizedPromptText = '';
+    let comparisonData = null;
 
     // Character count
     inputPrompt.addEventListener('input', () => {
@@ -613,14 +618,37 @@ Example: &quot;What do you think about remote work?&quot;"
       comparisonContent.innerHTML = '<span class="placeholder">Output comparison will appear here after optimization...</span>';
       comparisonContent.classList.remove('has-content');
       copyBtn.style.display = 'none';
+      copyComparisonBtn.style.display = 'none';
       optimizedText = '';
       optimizedPromptText = '';
+      comparisonData = null;
     });
 
     // Copy button
     copyBtn.addEventListener('click', async () => {
       if (optimizedText) {
         await navigator.clipboard.writeText(optimizedText);
+        showToast();
+      }
+    });
+
+    // Copy comparison button
+    copyComparisonBtn.addEventListener('click', async () => {
+      if (comparisonData) {
+        const comparisonText = `YOUR PROMPT OUTPUT:
+${comparisonData.originalOutput}
+
+---
+
+OPTIMIZED PROMPT OUTPUT:
+${comparisonData.optimizedOutput}
+
+---
+
+WHY THE OPTIMIZED OUTPUT IS BETTER:
+${comparisonData.analysis}`;
+
+        await navigator.clipboard.writeText(comparisonText);
         showToast();
       }
     });
@@ -692,15 +720,19 @@ Example: &quot;What do you think about remote work?&quot;"
           })
         });
 
-        const comparisonData = await comparisonResponse.json();
+        const comparisonResult = await comparisonResponse.json();
 
         if (!comparisonResponse.ok) {
-          throw new Error(comparisonData.error || 'Failed to generate comparison');
+          throw new Error(comparisonResult.error || 'Failed to generate comparison');
         }
+
+        // Store comparison data for copying
+        comparisonData = comparisonResult;
 
         // Display comparison
         comparisonContent.innerHTML = formatComparison(comparisonData);
         comparisonContent.classList.add('has-content');
+        copyComparisonBtn.style.display = 'block';
 
       } catch (error) {
         console.error('Error:', error);
