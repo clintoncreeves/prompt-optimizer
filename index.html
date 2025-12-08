@@ -635,7 +635,12 @@ Example: &quot;What do you think about remote work?&quot;"
     // Copy comparison button
     copyComparisonBtn.addEventListener('click', async () => {
       if (comparisonData) {
-        const comparisonText = `YOUR PROMPT OUTPUT:
+        const comparisonText = `${comparisonData.tldr ? `TL;DR:
+${comparisonData.tldr}
+
+---
+
+` : ''}YOUR PROMPT OUTPUT:
 ${comparisonData.originalOutput}
 
 ---
@@ -791,6 +796,10 @@ ${comparisonData.analysis}`;
       }
 
       return `
+${data.tldr ? `<div class="comparison-subsection">
+  <span class="comparison-label" style="color: var(--accent);">TL;DR</span>
+  <div class="comparison-text" style="color: var(--text-primary); font-weight: 500;">${escapeHtml(data.tldr)}</div>
+</div>` : ''}
 <div class="comparison-subsection">
   <span class="comparison-label original">Your Prompt Output</span>
   <div class="comparison-text">${escapeHtml(data.originalOutput)}</div>

@@ -40,7 +40,7 @@ export default async function handler(req, res) {
           'anthropic-version': '2023-06-01'
         },
         body: JSON.stringify({
-          model: 'claude-4-5-haiku-20250514',
+          model: 'claude-haiku-4-5-20251001',
           max_tokens: 800,
           messages: [
             {
@@ -74,12 +74,12 @@ export default async function handler(req, res) {
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-4-5-haiku-20250514',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 500,
         messages: [
           {
             role: 'user',
-            content: `You are an expert in prompt engineering. Compare these two AI responses and explain why the second one is more effective.
+            content: `You are an expert in prompt engineering. Analyze these two AI responses.
 
 ORIGINAL PROMPT:
 "${originalPrompt}"
@@ -97,12 +97,13 @@ ${optimizedOutput}
 
 ---
 
-Provide a concise analysis (2-3 sentences) explaining:
-1. What makes the optimized prompt's output superior
-2. Which specific simulator mindset techniques made the difference
-3. How this demonstrates better prompt engineering
+Provide your response in this exact format:
 
-Be specific and educational. Focus on teaching the user what improved.`
+TL;DR:
+[One sentence summarizing the key insight or conclusion from the optimized output]
+
+ANALYSIS:
+[2-3 sentences explaining what makes the optimized prompt's output superior, which simulator mindset techniques made the difference, and how this demonstrates better prompt engineering]`
           }
         ]
       })
@@ -113,12 +114,20 @@ Be specific and educational. Focus on teaching the user what improved.`
     }
 
     const analysisData = await analysisResponse.json();
-    const analysis = analysisData.content[0].text;
+    const analysisText = analysisData.content[0].text;
 
-    // Return all three outputs
+    // Parse TL;DR and analysis
+    const tldrMatch = analysisText.match(/TL;DR:\s*([\s\S]*?)(?=ANALYSIS:|$)/i);
+    const analysisMatch = analysisText.match(/ANALYSIS:\s*([\s\S]*?)$/i);
+
+    const tldr = tldrMatch ? tldrMatch[1].trim() : '';
+    const analysis = analysisMatch ? analysisMatch[1].trim() : analysisText;
+
+    // Return all outputs
     return res.status(200).json({
       originalOutput,
       optimizedOutput,
+      tldr,
       analysis
     });
 

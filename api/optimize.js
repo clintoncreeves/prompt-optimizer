@@ -36,7 +36,7 @@ export default async function handler(req, res) {
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-4-5-haiku-20250514',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 1000,
         messages: [
           {
@@ -61,6 +61,9 @@ Take the user's original prompt and create an optimized version that applies the
 - Be clear and actionable
 
 Respond in this exact format (no markdown, just plain text with these labels):
+
+SUMMARY:
+[One concise sentence summarizing the key improvement]
 
 ORIGINAL ANALYSIS:
 [1-2 sentences on what's weak about the original prompt]
