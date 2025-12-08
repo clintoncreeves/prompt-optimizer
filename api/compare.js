@@ -100,10 +100,10 @@ ${optimizedOutput}
 Provide your response in this exact format:
 
 TL;DR:
-[One sentence summarizing the key insight or conclusion from the optimized output]
+[In under 60 words, summarize: (1) what the original prompt produced, (2) what the optimized prompt produced, and (3) why the optimized version better enabled the user to steer the AI for their intended purpose]
 
 ANALYSIS:
-[2-3 sentences explaining what makes the optimized prompt's output superior, which simulator mindset techniques made the difference, and how this demonstrates better prompt engineering]`
+[2-3 sentences with deeper explanation of which simulator mindset techniques made the difference and how this demonstrates better prompt engineering]`
           }
         ]
       })
