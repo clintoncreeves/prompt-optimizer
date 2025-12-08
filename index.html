@@ -543,6 +543,14 @@ Example: &quot;What do you think about remote work?&quot;"
       charCount.textContent = inputPrompt.value.length;
     });
 
+    // Enter key to optimize (Shift+Enter for new line)
+    inputPrompt.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        optimizeBtn.click();
+      }
+    });
+
     // Clear button
     clearBtn.addEventListener('click', () => {
       inputPrompt.value = '';
