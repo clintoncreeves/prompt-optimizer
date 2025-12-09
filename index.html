@@ -685,39 +685,6 @@
       color: var(--pearl);
     }
 
-    /* Sim Toggle Button */
-    .sim-toggle {
-      position: fixed;
-      top: 1.5rem;
-      right: 1.5rem;
-      width: 40px;
-      height: 40px;
-      border: 2px solid rgba(138, 138, 149, 0.3);
-      border-radius: 10px;
-      background: rgba(26, 26, 30, 0.8);
-      font-size: 1.25rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      z-index: 10;
-      display: none;
-    }
-
-    .sim-toggle.visible {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .sim-toggle.enabled {
-      border-color: var(--spark);
-      background: rgba(255, 107, 53, 0.1);
-    }
-
-    .sim-toggle:hover {
-      transform: translateY(-2px);
-      border-color: var(--spark);
-    }
-
     /* Footer */
     footer {
       margin-top: 4rem;
@@ -791,14 +758,6 @@
 
       .sim-intro-content {
         max-width: 100%;
-      }
-
-      .sim-toggle {
-        top: 1rem;
-        right: 1rem;
-        width: 36px;
-        height: 36px;
-        font-size: 1.1rem;
       }
     }
   </style>
@@ -988,11 +947,6 @@ Example: &quot;What do you think about remote work?&quot;"
     </div>
   </div>
 
-  <!-- Sim Toggle Button -->
-  <button class="sim-toggle" id="simToggle" title="Toggle Sim companion">
-    👾
-  </button>
-
   <script>
     const inputPrompt = document.getElementById('inputPrompt');
     const outputContent = document.getElementById('outputContent');
@@ -1017,64 +971,57 @@ Example: &quot;What do you think about remote work?&quot;"
     const simIntro = document.getElementById('simIntro');
     const simIntroYes = document.getElementById('simIntroYes');
     const simIntroNo = document.getElementById('simIntroNo');
-    const simToggle = document.getElementById('simToggle');
 
-    // Sim enabled by default now
-    let simEnabled = localStorage.getItem('simEnabled') !== 'false'; // Default true
-    let simIntroShown = localStorage.getItem('simIntroShown') === 'true';
+    let simActivated = localStorage.getItem('simActivated') === 'true';
+    let simDismissed = localStorage.getItem('simDismissed') === 'true';
     let transformCount = parseInt(localStorage.getItem('transformCount') || '0');
 
-    // Show Sim and toggle button on load
-    simToggle.classList.add('visible');
-    if (simEnabled) {
-      simToggle.classList.add('enabled');
-      // Show Sim immediately with a greeting
-      setTimeout(() => {
-        simMessage.textContent = 'Hi! I\'m Sim, your companion!';
-        simContainer.classList.add('show');
-
-        // Hide after 3 seconds
-        setTimeout(() => {
-          simContainer.classList.remove('show');
-        }, 3000);
-      }, 1000);
+    // Show Sim if already activated
+    if (simActivated && !simDismissed) {
+      simContainer.classList.add('show');
     }
 
-    // Sim toggle
-    simToggle.addEventListener('click', () => {
-      simEnabled = !simEnabled;
-      localStorage.setItem('simEnabled', simEnabled);
-      simToggle.classList.toggle('enabled', simEnabled);
+    // Detect bottom-right corner hover (200x200px zone)
+    document.addEventListener('mousemove', (e) => {
+      if (simActivated || simDismissed) return;
 
-      if (simEnabled) {
-        showSim({
-          morph: 'idle',
-          fill: 'url(#bodyGradient)',
-          outline: '#ff6b35',
-          message: 'Sim is back!'
-        });
+      const windowWidth = window.innerWidth;
+      const windowHeight = window.innerHeight;
+      const cornerSize = 200;
+
+      // Check if mouse is in bottom-right corner
+      if (e.clientX > windowWidth - cornerSize && e.clientY > windowHeight - cornerSize) {
+        activateSim();
       }
     });
 
-    // Sim intro handlers
+    function activateSim() {
+      if (simActivated) return;
+
+      simActivated = true;
+      localStorage.setItem('simActivated', 'true');
+
+      // Show Sim with greeting
+      simMessage.textContent = 'Hi! I\'m Sim, your companion!';
+      simContainer.classList.add('show');
+    }
+
+    // Click Sim to dismiss
+    simContainer.addEventListener('click', (e) => {
+      if (!simActivated) return;
+      e.stopPropagation();
+
+      simDismissed = true;
+      localStorage.setItem('simDismissed', 'true');
+      simContainer.classList.remove('show');
+    });
+
+    // Sim intro handlers (remove intro prompt - not needed with new behavior)
     simIntroYes.addEventListener('click', () => {
-      simEnabled = true;
-      simIntroShown = true;
-      localStorage.setItem('simEnabled', 'true');
-      localStorage.setItem('simIntroShown', 'true');
       simIntro.classList.remove('show');
-      simToggle.classList.add('visible', 'enabled');
-      setTimeout(() => showSim({
-        morph: 'idle',
-        fill: 'url(#bodyGradient)',
-        outline: '#ff6b35',
-        message: 'Great! I\'ll celebrate your wins!'
-      }), 400);
     });
 
     simIntroNo.addEventListener('click', () => {
-      transformCount = 0; // Reset count to ask again later
-      localStorage.setItem('transformCount', '0');
       simIntro.classList.remove('show');
     });
 
@@ -1121,7 +1068,7 @@ Example: &quot;What do you think about remote work?&quot;"
     }
 
     function showSim(technique) {
-      if (!simEnabled) return;
+      if (simDismissed || !simActivated) return;
 
       // Morph the character
       simBody.setAttribute('fill', technique.fill);
@@ -1129,13 +1076,11 @@ Example: &quot;What do you think about remote work?&quot;"
       simMessage.textContent = technique.message;
       simContainer.classList.add('show');
 
-      // Auto-hide after 3 seconds, then reset to idle
+      // Reset to idle after 3 seconds, but keep visible
       setTimeout(() => {
-        simContainer.classList.remove('show');
-        setTimeout(() => {
-          simBody.setAttribute('fill', 'url(#bodyGradient)');
-          simOutline.setAttribute('stroke', '#ff6b35');
-        }, 400);
+        simBody.setAttribute('fill', 'url(#bodyGradient)');
+        simOutline.setAttribute('stroke', '#ff6b35');
+        simMessage.textContent = 'Click me to hide';
       }, 3000);
     }
 
@@ -1218,90 +1163,31 @@ Example: &quot;What do you think about remote work?&quot;"
       }
     }
 
-    // Hover interaction
+    // Hover interaction - show hint to dismiss
     simContainer.addEventListener('mouseenter', () => {
-      if (!simEnabled) return;
+      if (!simActivated || simDismissed) return;
       isHovering = true;
 
-      // Scale up and show random message
+      // Scale up slightly
       simContainer.style.transform = 'translateY(0) scale(1.1)';
       simContainer.style.transition = 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)';
 
-      const randomMessage = hoverMessages[Math.floor(Math.random() * hoverMessages.length)];
-      simMessage.textContent = randomMessage;
+      // Show dismiss hint
+      if (simMessage.textContent !== 'Hi! I\'m Sim, your companion!') {
+        simMessage.textContent = 'Click to dismiss';
+      }
     });
 
     simContainer.addEventListener('mouseleave', () => {
       isHovering = false;
       simContainer.style.transform = 'translateY(0) scale(1)';
       simContainer.style.transition = 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+
+      // Reset message
+      if (simMessage.textContent === 'Click to dismiss') {
+        simMessage.textContent = 'Click me to hide';
+      }
     });
-
-    // Click interaction
-    simContainer.addEventListener('click', (e) => {
-      if (!simEnabled) return;
-      e.stopPropagation();
-
-      clickCount++;
-
-      // Clear existing timer
-      if (clickTimer) clearTimeout(clickTimer);
-
-      // Check for double-click
-      clickTimer = setTimeout(() => {
-        if (clickCount === 1) {
-          // Single click: cycle mood
-          handleSimClick();
-        } else if (clickCount >= 2) {
-          // Double click: show stats
-          handleSimDoubleClick();
-        }
-        clickCount = 0;
-      }, 300);
-    });
-
-    function handleSimClick() {
-      // Wiggle animation
-      simCharacter.style.animation = 'simWiggle 0.4s ease';
-
-      setTimeout(() => {
-        simCharacter.style.animation = 'simBob 2s ease-in-out infinite';
-      }, 400);
-
-      // Cycle through morph states
-      currentMorphIndex = (currentMorphIndex + 1) % morphStates.length;
-      const state = morphStates[currentMorphIndex];
-
-      simBody.setAttribute('fill', state.fill);
-      simOutline.setAttribute('stroke', state.outline);
-      simMessage.textContent = state.message;
-
-      // Show briefly
-      simContainer.classList.add('show');
-      setTimeout(() => {
-        simContainer.classList.remove('show');
-      }, 2000);
-    }
-
-    function handleSimDoubleClick() {
-      simMessage.textContent = `${transformCount} transformations! 🎉`;
-
-      // Rainbow border effect on outline
-      simOutline.style.animation = 'simRainbow 1s ease';
-
-      setTimeout(() => {
-        simOutline.style.animation = '';
-        simOutline.setAttribute('stroke', '#ff6b35');
-      }, 1000);
-
-      simContainer.classList.add('show');
-      setTimeout(() => {
-        simContainer.classList.remove('show');
-      }, 3000);
-    }
-
-    // Get reference to sim-character
-    const simCharacter = document.querySelector('.sim-character');
 
     // Character count
     inputPrompt.addEventListener('input', () => {
