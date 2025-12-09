@@ -547,21 +547,28 @@
     }
 
     .sim-character {
-      width: 48px;
-      height: 48px;
-      background: linear-gradient(135deg, var(--charcoal), var(--slate));
-      border: 2px solid var(--spark);
-      border-radius: 12px;
+      width: 56px;
+      height: 56px;
+      background: transparent;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.4));
       animation: simBob 2s ease-in-out infinite;
     }
 
-    .sim-face {
-      font-size: 1.5rem;
-      animation: simFacePop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    .sim-svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .sim-outline {
+      transition: stroke 0.4s ease;
+    }
+
+    .sim-body {
+      transition: fill 0.4s ease;
     }
 
     .sim-message {
@@ -581,16 +588,11 @@
       50% { transform: translateY(-4px); }
     }
 
-    @keyframes simFacePop {
-      0% { transform: scale(0); }
-      50% { transform: scale(1.2); }
-      100% { transform: scale(1); }
-    }
-
     @keyframes simWiggle {
       0%, 100% { transform: rotate(0deg); }
-      25% { transform: rotate(-15deg); }
-      75% { transform: rotate(15deg); }
+      25% { transform: rotate(-12deg); }
+      50% { transform: rotate(12deg); }
+      75% { transform: rotate(-8deg); }
     }
 
     @keyframes simRainbow {
@@ -773,12 +775,8 @@
       }
 
       .sim-character {
-        width: 40px;
-        height: 40px;
-      }
-
-      .sim-face {
-        font-size: 1.25rem;
+        width: 44px;
+        height: 44px;
       }
 
       .sim-message {
@@ -913,7 +911,65 @@ Example: &quot;What do you think about remote work?&quot;"
   <!-- Sim Character -->
   <div class="sim-container" id="simContainer">
     <div class="sim-character">
-      <div class="sim-face" id="simFace">✨</div>
+      <svg class="sim-svg" id="simSvg" width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <!-- Gradient Definitions -->
+        <defs>
+          <!-- Base body gradient -->
+          <linearGradient id="bodyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:#1a1a1e"/>
+            <stop offset="100%" style="stop-color:#2a2a32"/>
+          </linearGradient>
+
+          <!-- Constellation pattern for perspectives -->
+          <pattern id="constellationPattern" width="48" height="48" patternUnits="userSpaceOnUse">
+            <rect width="48" height="48" fill="url(#bodyGradient)"/>
+            <circle cx="12" cy="12" r="1.5" fill="#a78bfa" opacity="0.8"/>
+            <circle cx="24" cy="8" r="1" fill="#4f90f2" opacity="0.6"/>
+            <circle cx="36" cy="14" r="1.5" fill="#a78bfa" opacity="0.8"/>
+            <circle cx="18" cy="24" r="1" fill="#4f90f2" opacity="0.6"/>
+            <circle cx="32" cy="28" r="1.5" fill="#a78bfa" opacity="0.8"/>
+            <circle cx="14" cy="36" r="1" fill="#4f90f2" opacity="0.6"/>
+            <circle cx="30" cy="38" r="1.5" fill="#a78bfa" opacity="0.8"/>
+            <line x1="12" y1="12" x2="24" y2="8" stroke="#a78bfa" stroke-width="0.5" opacity="0.3"/>
+            <line x1="24" y1="8" x2="36" y2="14" stroke="#a78bfa" stroke-width="0.5" opacity="0.3"/>
+          </pattern>
+
+          <!-- Split pattern for debates -->
+          <linearGradient id="splitPattern" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#ef4444"/>
+            <stop offset="49%" style="stop-color:#ef4444"/>
+            <stop offset="51%" style="stop-color:#4f90f2"/>
+            <stop offset="100%" style="stop-color:#4f90f2"/>
+          </linearGradient>
+
+          <!-- Circuit pattern for critical thinking -->
+          <pattern id="circuitPattern" width="48" height="48" patternUnits="userSpaceOnUse">
+            <rect width="48" height="48" fill="url(#bodyGradient)"/>
+            <path d="M8,12 L20,12 M20,8 L20,16 M20,12 L28,12 M28,8 L28,20 M28,20 L40,20 M12,24 L24,24 M24,20 L24,28 M24,28 L36,28 M16,32 L28,32 M28,28 L28,36 M28,36 L40,36"
+                  stroke="#5dba89" stroke-width="1" fill="none" opacity="0.4"/>
+            <circle cx="20" cy="12" r="2" fill="#5dba89" opacity="0.6"/>
+            <circle cx="28" cy="20" r="2" fill="#5dba89" opacity="0.6"/>
+            <circle cx="24" cy="28" r="2" fill="#5dba89" opacity="0.6"/>
+          </pattern>
+        </defs>
+
+        <!-- Body shape -->
+        <path class="sim-body" id="simBody"
+              d="M16,6 L32,6 L36,10 L36,20 L40,24 L40,34 L36,38 L30,38 L28,42 L20,42 L18,38 L12,38 L8,34 L8,24 L12,20 L12,10 Z"
+              fill="url(#bodyGradient)"/>
+
+        <!-- Outline -->
+        <path class="sim-outline" id="simOutline"
+              d="M16,6 L32,6 L36,10 L36,20 L40,24 L40,34 L36,38 L30,38 L28,42 L20,42 L18,38 L12,38 L8,34 L8,24 L12,20 L12,10 Z"
+              fill="none" stroke="#ff6b35" stroke-width="2"/>
+
+        <!-- Face -->
+        <g class="sim-face">
+          <circle class="sim-eye-left" cx="18" cy="18" r="2" fill="#f5f5f7"/>
+          <circle class="sim-eye-right" cx="30" cy="18" r="2" fill="#f5f5f7"/>
+          <circle class="sim-glint" cx="24" cy="24" r="1" fill="#ff6b35"/>
+        </g>
+      </svg>
     </div>
     <div class="sim-message" id="simMessage">Transformation complete!</div>
   </div>
@@ -955,7 +1011,8 @@ Example: &quot;What do you think about remote work?&quot;"
 
     // Sim Character System
     const simContainer = document.getElementById('simContainer');
-    const simFace = document.getElementById('simFace');
+    const simBody = document.getElementById('simBody');
+    const simOutline = document.getElementById('simOutline');
     const simMessage = document.getElementById('simMessage');
     const simIntro = document.getElementById('simIntro');
     const simIntroYes = document.getElementById('simIntroYes');
@@ -973,7 +1030,6 @@ Example: &quot;What do you think about remote work?&quot;"
       simToggle.classList.add('enabled');
       // Show Sim immediately with a greeting
       setTimeout(() => {
-        simFace.textContent = '👋';
         simMessage.textContent = 'Hi! I\'m Sim, your companion!';
         simContainer.classList.add('show');
 
@@ -991,7 +1047,12 @@ Example: &quot;What do you think about remote work?&quot;"
       simToggle.classList.toggle('enabled', simEnabled);
 
       if (simEnabled) {
-        showSim('✨', 'Sim is back!');
+        showSim({
+          morph: 'idle',
+          fill: 'url(#bodyGradient)',
+          outline: '#ff6b35',
+          message: 'Sim is back!'
+        });
       }
     });
 
@@ -1003,7 +1064,12 @@ Example: &quot;What do you think about remote work?&quot;"
       localStorage.setItem('simIntroShown', 'true');
       simIntro.classList.remove('show');
       simToggle.classList.add('visible', 'enabled');
-      setTimeout(() => showSim('✨', 'Great! I\'ll celebrate your wins!'), 400);
+      setTimeout(() => showSim({
+        morph: 'idle',
+        fill: 'url(#bodyGradient)',
+        outline: '#ff6b35',
+        message: 'Great! I\'ll celebrate your wins!'
+      }), 400);
     });
 
     simIntroNo.addEventListener('click', () => {
@@ -1017,33 +1083,59 @@ Example: &quot;What do you think about remote work?&quot;"
 
       // Check for debate/multiple perspectives
       if (lower.includes('debate') || lower.includes('argue') || lower.includes('advocate') || lower.includes('critic')) {
-        return { emoji: '⚖️', message: 'Nice debate structure!' };
+        return {
+          morph: 'debate',
+          fill: 'url(#splitPattern)',
+          outline: '#ef4444',
+          message: 'Nice debate structure!'
+        };
       }
 
       // Check for specific perspectives
       if (lower.includes('as a ') || lower.includes('perspective of') || lower.includes('expert') || lower.includes('viewpoint')) {
-        return { emoji: '🔮', message: 'Specific perspectives summoned!' };
+        return {
+          morph: 'perspective',
+          fill: 'url(#constellationPattern)',
+          outline: '#a78bfa',
+          message: 'Specific perspectives summoned!'
+        };
       }
 
       // Check for critical thinking/failure modes
       if (lower.includes('skeptic') || lower.includes('critic') || lower.includes('fail') || lower.includes('flaw') || lower.includes('risk') || lower.includes('problem')) {
-        return { emoji: '🧠', message: 'Good critical thinking!' };
+        return {
+          morph: 'critical',
+          fill: 'url(#circuitPattern)',
+          outline: '#5dba89',
+          message: 'Good critical thinking!'
+        };
       }
 
       // Default
-      return { emoji: '✨', message: 'Transformation complete!' };
+      return {
+        morph: 'idle',
+        fill: 'url(#bodyGradient)',
+        outline: '#ff6b35',
+        message: 'Transformation complete!'
+      };
     }
 
-    function showSim(emoji, message) {
+    function showSim(technique) {
       if (!simEnabled) return;
 
-      simFace.textContent = emoji;
-      simMessage.textContent = message;
+      // Morph the character
+      simBody.setAttribute('fill', technique.fill);
+      simOutline.setAttribute('stroke', technique.outline);
+      simMessage.textContent = technique.message;
       simContainer.classList.add('show');
 
-      // Auto-hide after 3 seconds
+      // Auto-hide after 3 seconds, then reset to idle
       setTimeout(() => {
         simContainer.classList.remove('show');
+        setTimeout(() => {
+          simBody.setAttribute('fill', 'url(#bodyGradient)');
+          simOutline.setAttribute('stroke', '#ff6b35');
+        }, 400);
       }, 3000);
     }
 
@@ -1081,8 +1173,13 @@ Example: &quot;What do you think about remote work?&quot;"
       'Need help?'
     ];
 
-    const moods = ['✨', '🔮', '⚖️', '🧠'];
-    let currentMoodIndex = 0;
+    const morphStates = [
+      { name: 'idle', fill: 'url(#bodyGradient)', outline: '#ff6b35', message: 'Idle mode' },
+      { name: 'perspective', fill: 'url(#constellationPattern)', outline: '#a78bfa', message: 'Perspective mode!' },
+      { name: 'debate', fill: 'url(#splitPattern)', outline: '#ef4444', message: 'Debate mode!' },
+      { name: 'critical', fill: 'url(#circuitPattern)', outline: '#5dba89', message: 'Critical mode!' }
+    ];
+    let currentMorphIndex = 0;
 
     // Track mouse movement (desktop only)
     if (!('ontouchstart' in window)) {
@@ -1171,10 +1268,13 @@ Example: &quot;What do you think about remote work?&quot;"
         simCharacter.style.animation = 'simBob 2s ease-in-out infinite';
       }, 400);
 
-      // Cycle mood
-      currentMoodIndex = (currentMoodIndex + 1) % moods.length;
-      simFace.textContent = moods[currentMoodIndex];
-      simMessage.textContent = 'Changed mood!';
+      // Cycle through morph states
+      currentMorphIndex = (currentMorphIndex + 1) % morphStates.length;
+      const state = morphStates[currentMorphIndex];
+
+      simBody.setAttribute('fill', state.fill);
+      simOutline.setAttribute('stroke', state.outline);
+      simMessage.textContent = state.message;
 
       // Show briefly
       simContainer.classList.add('show');
@@ -1184,16 +1284,14 @@ Example: &quot;What do you think about remote work?&quot;"
     }
 
     function handleSimDoubleClick() {
-      simFace.textContent = '🎉';
-      simMessage.textContent = `${transformCount} transformations!`;
+      simMessage.textContent = `${transformCount} transformations! 🎉`;
 
-      // Rainbow border effect
-      simCharacter.style.borderColor = 'var(--sage)';
-      simCharacter.style.animation = 'simRainbow 1s ease';
+      // Rainbow border effect on outline
+      simOutline.style.animation = 'simRainbow 1s ease';
 
       setTimeout(() => {
-        simCharacter.style.borderColor = 'var(--spark)';
-        simCharacter.style.animation = 'simBob 2s ease-in-out infinite';
+        simOutline.style.animation = '';
+        simOutline.setAttribute('stroke', '#ff6b35');
       }, 1000);
 
       simContainer.classList.add('show');
@@ -1335,7 +1433,7 @@ Example: &quot;What do you think about remote work?&quot;"
         // Sim celebration
         checkSimIntro();
         const technique = detectTechnique(optimizedPromptText);
-        showSim(technique.emoji, technique.message);
+        showSim(technique);
 
       } catch (error) {
         console.error('Error:', error);
