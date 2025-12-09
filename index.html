@@ -931,14 +931,11 @@ ${data.tldr ? `<div class="content-section">
       // Escape HTML first
       const escaped = escapeHtml(text);
 
-      // Convert markdown-style formatting to HTML
+      // Convert markdown-style formatting to HTML (Safari-compatible)
       let formatted = escaped
         // Bold: **text** or __text__
         .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
         .replace(/__(.+?)__/g, '<strong>$1</strong>')
-        // Italic: *text* or _text_ (but not in middle of words)
-        .replace(/(?<!\w)\*([^*]+?)\*(?!\w)/g, '<em>$1</em>')
-        .replace(/(?<!\w)_([^_]+?)_(?!\w)/g, '<em>$1</em>')
         // Convert double newlines to paragraph breaks
         .replace(/\n\n+/g, '</p><p>')
         // Convert single newlines to line breaks
