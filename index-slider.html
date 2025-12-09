@@ -921,9 +921,9 @@ Example: &quot;What do you think about remote work?&quot;"
       charCount.textContent = inputPrompt.value.length;
     });
 
-    // Enter key to transform
+    // Enter key to transform (Shift+Enter for line breaks)
     inputPrompt.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+      if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         transformBtn.click();
       }
