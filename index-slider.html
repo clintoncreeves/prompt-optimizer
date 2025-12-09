@@ -408,6 +408,17 @@
       height: 100%;
       display: grid;
       grid-template-columns: 1fr 1fr;
+      overflow: hidden;
+    }
+
+    .canvas-side:last-child {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      clip-path: inset(0 0 0 50%);
+      transition: clip-path 0.05s ease-out;
     }
 
     /* Sides */
@@ -892,6 +903,14 @@ Example: &quot;What do you think about remote work?&quot;"
       charCount.textContent = inputPrompt.value.length;
     });
 
+    // Enter key to transform
+    inputPrompt.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        transformBtn.click();
+      }
+    });
+
     // Toggle principles overlay
     function togglePrinciples() {
       document.getElementById('principlesOverlay').classList.toggle('active');
@@ -1039,22 +1058,57 @@ Example: &quot;What do you think about remote work?&quot;"
       setTimeout(() => toast.classList.remove('show'), 2000);
     }
 
-    // Basic slider interaction (simplified for this version)
+    // Slider interaction with comparison reveal
     const sliderHandle = document.querySelector('.slider-handle');
+    const sliderContainer = document.querySelector('.slider-container');
     let isDragging = false;
 
+    function updateSlider(clientX) {
+      const canvas = document.querySelector('.canvas-container');
+      if (!canvas) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
+      const percentage = (x / rect.width) * 100;
+
+      // Update slider position
+      sliderContainer.style.left = `${percentage}%`;
+
+      // Update clip-path on right side to reveal comparison
+      const rightSide = document.querySelector('.canvas-side:last-child');
+      if (rightSide) {
+        rightSide.style.clipPath = `inset(0 0 0 ${percentage}%)`;
+      }
+    }
+
     if (sliderHandle) {
-      sliderHandle.addEventListener('mousedown', () => isDragging = true);
-      document.addEventListener('mouseup', () => isDragging = false);
+      sliderHandle.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        e.preventDefault();
+      });
+
+      document.addEventListener('mouseup', () => {
+        isDragging = false;
+      });
+
       document.addEventListener('mousemove', (e) => {
         if (!isDragging) return;
-        const canvas = document.querySelector('.canvas-container');
-        if (!canvas) return;
-        const rect = canvas.getBoundingClientRect();
-        const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
-        const percentage = (x / rect.width) * 100;
-        // Slider visual feedback (actual split-view would require more complex implementation)
-        sliderHandle.style.left = `${percentage}%`;
+        updateSlider(e.clientX);
+      });
+
+      // Touch support for mobile
+      sliderHandle.addEventListener('touchstart', (e) => {
+        isDragging = true;
+        e.preventDefault();
+      });
+
+      document.addEventListener('touchend', () => {
+        isDragging = false;
+      });
+
+      document.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        updateSlider(e.touches[0].clientX);
       });
     }
   </script>
