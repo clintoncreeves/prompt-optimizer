@@ -8,6 +8,7 @@ A prompt optimization tool that uses the "Simulator Mindset" methodology to tran
 - **Simulator Mindset Methodology**: Applies advanced prompt engineering techniques
 - **Clean UI**: Modern, responsive interface with dark mode design
 - **Real-time Optimization**: Get instant feedback on prompt improvements
+- **Output Comparison**: See how your original vs optimized prompts perform
 
 ## Deployment
 
@@ -15,12 +16,7 @@ A prompt optimization tool that uses the "Simulator Mindset" methodology to tran
 
 1. **Fork or clone this repository**
 
-2. **Install Vercel CLI** (optional, for local testing):
-   ```bash
-   npm install -g vercel
-   ```
-
-3. **Deploy to Vercel**:
+2. **Deploy to Vercel**:
    - Visit [vercel.com](https://vercel.com)
    - Click "Add New Project"
    - Import this repository
@@ -41,12 +37,17 @@ A prompt optimization tool that uses the "Simulator Mindset" methodology to tran
    # Edit .env and add your ANTHROPIC_API_KEY
    ```
 
-3. **Run locally with Vercel CLI**:
+3. **Install Vercel CLI** (for local testing):
+   ```bash
+   npm install -g vercel
+   ```
+
+4. **Run locally with Vercel CLI**:
    ```bash
    vercel dev
    ```
 
-4. **Open in browser**:
+5. **Open in browser**:
    - Navigate to `http://localhost:3000`
 
 ## Project Structure
@@ -55,7 +56,8 @@ A prompt optimization tool that uses the "Simulator Mindset" methodology to tran
 prompt-optimizer/
 ├── index.html          # Main UI
 ├── api/
-│   └── optimize.js     # Serverless function for API calls
+│   ├── optimize.js     # Serverless function for prompt optimization
+│   └── compare.js      # Serverless function for output comparison
 ├── .env.example        # Environment variable template
 ├── .gitignore          # Git ignore rules
 └── README.md           # This file
@@ -66,7 +68,9 @@ prompt-optimizer/
 1. **Client-side**: User enters a prompt in the web interface
 2. **Server-side**: Request is sent to `/api/optimize` serverless function
 3. **API Call**: Serverless function calls Anthropic's Claude API with your secure API key
-4. **Response**: Optimized prompt is returned and displayed to the user
+4. **Optimization**: Claude transforms the prompt using simulator mindset techniques
+5. **Comparison**: Both prompts are executed and results are compared
+6. **Response**: Optimized prompt and comparison are returned and displayed to the user
 
 ## Security
 
@@ -80,7 +84,7 @@ prompt-optimizer/
 
 - **Frontend**: Vanilla JavaScript, HTML5, CSS3
 - **Backend**: Vercel Serverless Functions
-- **AI**: Anthropic Claude (Sonnet 4)
+- **AI**: Anthropic Claude (Haiku 4.5)
 
 ## License
 
