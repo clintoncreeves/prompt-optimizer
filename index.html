@@ -390,24 +390,6 @@
       line-height: 1.75;
     }
 
-    .section-text p {
-      margin: 0 0 1rem 0;
-    }
-
-    .section-text p:last-child {
-      margin-bottom: 0;
-    }
-
-    .section-text strong {
-      color: var(--pearl);
-      font-weight: 600;
-    }
-
-    .section-text em {
-      color: var(--mist);
-      font-style: italic;
-    }
-
     /* Action Bar */
     .action-bar {
       display: flex;
@@ -881,15 +863,15 @@ Example: &quot;What do you think about remote work?&quot;"
       return `
 <div class="content-section">
   <span class="section-label accent">Analysis</span>
-  <div class="section-text">${formatText(sections.analysis)}</div>
+  <div class="section-text">${escapeHtml(sections.analysis)}</div>
 </div>
 <div class="content-section">
   <span class="section-label success">Transformed Prompt</span>
-  <div class="section-text">${formatText(sections.optimized)}</div>
+  <div class="section-text">${escapeHtml(sections.optimized)}</div>
 </div>
 <div class="content-section">
   <span class="section-label info">Why It's Better</span>
-  <div class="section-text">${formatText(sections.why)}</div>
+  <div class="section-text">${escapeHtml(sections.why)}</div>
 </div>
       `;
     }
@@ -902,19 +884,19 @@ Example: &quot;What do you think about remote work?&quot;"
       return `
 ${data.tldr ? `<div class="content-section">
   <span class="section-label accent">TL;DR</span>
-  <div class="section-text" style="font-weight: 500;">${formatText(data.tldr)}</div>
+  <div class="section-text" style="font-weight: 500;">${escapeHtml(data.tldr)}</div>
 </div>` : ''}
 <div class="content-section">
   <span class="section-label">Your Prompt Output</span>
-  <div class="section-text">${formatText(data.originalOutput)}</div>
+  <div class="section-text">${escapeHtml(data.originalOutput)}</div>
 </div>
 <div class="content-section">
   <span class="section-label success">Transformed Prompt Output</span>
-  <div class="section-text">${formatText(data.optimizedOutput)}</div>
+  <div class="section-text">${escapeHtml(data.optimizedOutput)}</div>
 </div>
 <div class="content-section">
   <span class="section-label info">Why the transformed output is better</span>
-  <div class="section-text">${formatText(data.analysis)}</div>
+  <div class="section-text">${escapeHtml(data.analysis)}</div>
 </div>
       `;
     }
@@ -923,26 +905,6 @@ ${data.tldr ? `<div class="content-section">
       const div = document.createElement('div');
       div.textContent = text;
       return div.innerHTML;
-    }
-
-    function formatText(text) {
-      if (!text) return '';
-
-      // Escape HTML first
-      const escaped = escapeHtml(text);
-
-      // Convert markdown-style formatting to HTML (Safari-compatible)
-      let formatted = escaped
-        // Bold: **text** or __text__
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-        .replace(/__(.+?)__/g, '<strong>$1</strong>')
-        // Convert double newlines to paragraph breaks
-        .replace(/\n\n+/g, '</p><p>')
-        // Convert single newlines to line breaks
-        .replace(/\n/g, '<br>');
-
-      // Wrap in paragraph tags
-      return `<p>${formatted}</p>`;
     }
   </script>
 </body>
