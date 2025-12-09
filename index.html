@@ -587,6 +587,20 @@
       100% { transform: scale(1); }
     }
 
+    @keyframes simWiggle {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-15deg); }
+      75% { transform: rotate(15deg); }
+    }
+
+    @keyframes simRainbow {
+      0% { border-color: var(--spark); }
+      25% { border-color: var(--sage); }
+      50% { border-color: var(--azure); }
+      75% { border-color: var(--lavender); }
+      100% { border-color: var(--spark); }
+    }
+
     /* Sim Intro Prompt */
     .sim-intro {
       position: fixed;
@@ -948,16 +962,26 @@ Example: &quot;What do you think about remote work?&quot;"
     const simIntroNo = document.getElementById('simIntroNo');
     const simToggle = document.getElementById('simToggle');
 
-    let simEnabled = localStorage.getItem('simEnabled') === 'true';
+    // Sim enabled by default now
+    let simEnabled = localStorage.getItem('simEnabled') !== 'false'; // Default true
     let simIntroShown = localStorage.getItem('simIntroShown') === 'true';
     let transformCount = parseInt(localStorage.getItem('transformCount') || '0');
 
-    // Initialize Sim toggle button
-    if (simIntroShown) {
-      simToggle.classList.add('visible');
-      if (simEnabled) {
-        simToggle.classList.add('enabled');
-      }
+    // Show Sim and toggle button on load
+    simToggle.classList.add('visible');
+    if (simEnabled) {
+      simToggle.classList.add('enabled');
+      // Show Sim immediately with a greeting
+      setTimeout(() => {
+        simFace.textContent = '👋';
+        simMessage.textContent = 'Hi! I\'m Sim, your companion!';
+        simContainer.classList.add('show');
+
+        // Hide after 3 seconds
+        setTimeout(() => {
+          simContainer.classList.remove('show');
+        }, 3000);
+      }, 1000);
     }
 
     // Sim toggle
@@ -1027,7 +1051,7 @@ Example: &quot;What do you think about remote work?&quot;"
       transformCount++;
       localStorage.setItem('transformCount', transformCount.toString());
 
-      // Show intro after first transformation
+      // Show intro after first transformation (simplified)
       if (transformCount === 1 && !simIntroShown) {
         setTimeout(() => {
           simIntro.classList.add('show');
@@ -1041,6 +1065,145 @@ Example: &quot;What do you think about remote work?&quot;"
         }, 1000);
       }
     }
+
+    // Cursor interaction system
+    let mouseX = 0, mouseY = 0;
+    let lastUpdate = 0;
+    let isHovering = false;
+    let clickCount = 0;
+    let clickTimer = null;
+
+    const hoverMessages = [
+      'Hello there! 👋',
+      'Ready to optimize?',
+      'The simulator is ready...',
+      'Great work so far!',
+      'Need help?'
+    ];
+
+    const moods = ['✨', '🔮', '⚖️', '🧠'];
+    let currentMoodIndex = 0;
+
+    // Track mouse movement (desktop only)
+    if (!('ontouchstart' in window)) {
+      document.addEventListener('mousemove', (e) => {
+        const now = Date.now();
+        if (now - lastUpdate < 100) return; // Throttle
+
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        lastUpdate = now;
+
+        updateSimOrientation();
+      });
+    }
+
+    function updateSimOrientation() {
+      if (!simEnabled) return;
+
+      const simRect = simContainer.getBoundingClientRect();
+      const simCenterX = simRect.left + simRect.width / 2;
+      const simCenterY = simRect.top + simRect.height / 2;
+
+      const deltaX = mouseX - simCenterX;
+      const deltaY = mouseY - simCenterY;
+      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+      // React if cursor is within 150px
+      if (distance < 150) {
+        const angle = Math.atan2(deltaY, deltaX);
+        const rotation = angle * (180 / Math.PI) * 0.1; // Subtle rotation
+        const clampedRotation = Math.max(-8, Math.min(8, rotation));
+
+        simContainer.style.transform = `translateY(0) rotate(${clampedRotation}deg)`;
+      } else {
+        simContainer.style.transform = 'translateY(0) rotate(0deg)';
+      }
+    }
+
+    // Hover interaction
+    simContainer.addEventListener('mouseenter', () => {
+      if (!simEnabled) return;
+      isHovering = true;
+
+      // Scale up and show random message
+      simContainer.style.transform = 'translateY(0) scale(1.1)';
+      simContainer.style.transition = 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)';
+
+      const randomMessage = hoverMessages[Math.floor(Math.random() * hoverMessages.length)];
+      simMessage.textContent = randomMessage;
+    });
+
+    simContainer.addEventListener('mouseleave', () => {
+      isHovering = false;
+      simContainer.style.transform = 'translateY(0) scale(1)';
+      simContainer.style.transition = 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+    });
+
+    // Click interaction
+    simContainer.addEventListener('click', (e) => {
+      if (!simEnabled) return;
+      e.stopPropagation();
+
+      clickCount++;
+
+      // Clear existing timer
+      if (clickTimer) clearTimeout(clickTimer);
+
+      // Check for double-click
+      clickTimer = setTimeout(() => {
+        if (clickCount === 1) {
+          // Single click: cycle mood
+          handleSimClick();
+        } else if (clickCount >= 2) {
+          // Double click: show stats
+          handleSimDoubleClick();
+        }
+        clickCount = 0;
+      }, 300);
+    });
+
+    function handleSimClick() {
+      // Wiggle animation
+      simCharacter.style.animation = 'simWiggle 0.4s ease';
+
+      setTimeout(() => {
+        simCharacter.style.animation = 'simBob 2s ease-in-out infinite';
+      }, 400);
+
+      // Cycle mood
+      currentMoodIndex = (currentMoodIndex + 1) % moods.length;
+      simFace.textContent = moods[currentMoodIndex];
+      simMessage.textContent = 'Changed mood!';
+
+      // Show briefly
+      simContainer.classList.add('show');
+      setTimeout(() => {
+        simContainer.classList.remove('show');
+      }, 2000);
+    }
+
+    function handleSimDoubleClick() {
+      simFace.textContent = '🎉';
+      simMessage.textContent = `${transformCount} transformations!`;
+
+      // Rainbow border effect
+      simCharacter.style.borderColor = 'var(--sage)';
+      simCharacter.style.animation = 'simRainbow 1s ease';
+
+      setTimeout(() => {
+        simCharacter.style.borderColor = 'var(--spark)';
+        simCharacter.style.animation = 'simBob 2s ease-in-out infinite';
+      }, 1000);
+
+      simContainer.classList.add('show');
+      setTimeout(() => {
+        simContainer.classList.remove('show');
+      }, 3000);
+    }
+
+    // Get reference to sim-character
+    const simCharacter = document.querySelector('.sim-character');
 
     // Character count
     inputPrompt.addEventListener('input', () => {
