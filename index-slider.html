@@ -500,6 +500,24 @@
       color: var(--pearl);
     }
 
+    .output-display p {
+      margin: 0 0 1rem 0;
+    }
+
+    .output-display p:last-child {
+      margin-bottom: 0;
+    }
+
+    .output-display strong {
+      color: var(--pearl);
+      font-weight: 600;
+    }
+
+    .output-display em {
+      color: var(--mist);
+      font-style: italic;
+    }
+
     /* Slider */
     .slider-container {
       position: absolute;
@@ -988,9 +1006,9 @@ Example: &quot;What do you think about remote work?&quot;"
           throw new Error(compareData.error || 'Failed to generate comparison');
         }
 
-        // Display outputs
-        document.getElementById('originalOutput').textContent = compareData.originalOutput;
-        document.getElementById('transformedOutput').textContent = compareData.optimizedOutput;
+        // Display outputs with proper formatting
+        document.getElementById('originalOutput').innerHTML = formatOutput(compareData.originalOutput);
+        document.getElementById('transformedOutput').innerHTML = formatOutput(compareData.optimizedOutput);
 
         // Display why section
         displayWhySection(sections, compareData);
@@ -1051,6 +1069,29 @@ Example: &quot;What do you think about remote work?&quot;"
       const div = document.createElement('div');
       div.textContent = text;
       return div.innerHTML;
+    }
+
+    function formatOutput(text) {
+      if (!text) return '';
+
+      // Escape HTML first
+      const escaped = escapeHtml(text);
+
+      // Convert markdown-style formatting to HTML
+      let formatted = escaped
+        // Bold: **text** or __text__
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/__(.+?)__/g, '<strong>$1</strong>')
+        // Italic: *text* or _text_
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        .replace(/_(.+?)_/g, '<em>$1</em>')
+        // Convert double newlines to paragraphs
+        .replace(/\n\n/g, '</p><p>')
+        // Convert single newlines to line breaks
+        .replace(/\n/g, '<br>');
+
+      // Wrap in paragraph tags
+      return `<p>${formatted}</p>`;
     }
 
     function showToast() {
