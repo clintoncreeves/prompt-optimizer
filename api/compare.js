@@ -92,10 +92,10 @@ ${originalOutput}
 
 ---
 
-OPTIMIZED PROMPT:
+TRANSFORMED PROMPT:
 "${optimizedPrompt}"
 
-OPTIMIZED OUTPUT:
+TRANSFORMED OUTPUT:
 ${optimizedOutput}
 
 ---
@@ -103,10 +103,10 @@ ${optimizedOutput}
 Provide your response in this exact format:
 
 TL;DR:
-[In under 60 words, summarize: (1) what the original prompt produced, (2) what the optimized prompt produced, and (3) why the optimized version better enabled the user to steer the AI for their intended purpose]
+[In under 60 words, summarize: (1) what the original prompt produced, (2) what the transformed prompt produced, and (3) why the transformed version better enabled the user to steer the AI by summoning specific perspectives]
 
 ANALYSIS:
-[2-3 sentences with deeper explanation of which simulator mindset techniques made the difference and how this demonstrates better prompt engineering]`
+[2-3 sentences with deeper explanation of which simulator mindset techniques made the difference and how channeling specific perspectives improved the output]`
           }
         ]
       })

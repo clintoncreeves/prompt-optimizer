@@ -1,14 +1,20 @@
-# Prompt Optimizer
+# The Simulator Mindset
 
-A prompt optimization tool that uses the "Simulator Mindset" methodology to transform basic prompts into more effective ones using Claude AI.
+A tool that helps you apply Andrej Karpathy's "simulator mindset" to transform how you prompt LLMs. Stop asking "you" for opinions—start channeling specific perspectives.
+
+## The Core Insight
+
+As [@karpathy pointed out](https://x.com/karpathy/status/1997731268969304070), an LLM isn't a person with opinions—it's a simulator that can channel *any* perspective. Instead of activating the default "helpful assistant" persona, you can summon the specific expertise you need.
+
+This tool takes your basic prompts and transforms them to leverage this insight.
 
 ## Features
 
+- **Simulator Mindset Application**: Transforms prompts to summon specific perspectives instead of generic responses
 - **Secure API Key Handling**: API keys are stored server-side, never exposed to the client
-- **Simulator Mindset Methodology**: Applies advanced prompt engineering techniques
-- **Clean UI**: Modern, responsive interface with dark mode design
-- **Real-time Optimization**: Get instant feedback on prompt improvements
-- **Output Comparison**: See how your original vs optimized prompts perform
+- **Live Comparison**: See how your original vs transformed prompts perform side-by-side
+- **Clean, Modern UI**: Beautiful dark interface with smooth animations
+- **Instant Results**: Get real-time transformations powered by Claude AI
 
 ## Deployment
 
@@ -53,10 +59,10 @@ A prompt optimization tool that uses the "Simulator Mindset" methodology to tran
 ## Project Structure
 
 ```
-prompt-optimizer/
+simulator-mindset/
 ├── index.html          # Main UI
 ├── api/
-│   ├── optimize.js     # Serverless function for prompt optimization
+│   ├── optimize.js     # Serverless function for prompt transformation
 │   └── compare.js      # Serverless function for output comparison
 ├── .env.example        # Environment variable template
 ├── .gitignore          # Git ignore rules
@@ -65,12 +71,20 @@ prompt-optimizer/
 
 ## How It Works
 
-1. **Client-side**: User enters a prompt in the web interface
+1. **Client-side**: User enters a basic prompt in the web interface
 2. **Server-side**: Request is sent to `/api/optimize` serverless function
-3. **API Call**: Serverless function calls Anthropic's Claude API with your secure API key
-4. **Optimization**: Claude transforms the prompt using simulator mindset techniques
-5. **Comparison**: Both prompts are executed and results are compared
-6. **Response**: Optimized prompt and comparison are returned and displayed to the user
+3. **Transformation**: Claude applies simulator mindset principles to summon specific perspectives
+4. **Comparison**: Both the original and transformed prompts are executed
+5. **Analysis**: Results are compared to show the improvement
+6. **Response**: Transformed prompt and comparison are displayed to the user
+
+### The Techniques Applied
+
+- **Summon Perspectives**: Replace "what do you think" with "how would [specific expert] view this"
+- **Stage Debates**: Request multiple viewpoints (advocates vs critics)
+- **Multiple Framings**: Ask for explanations targeted at different audiences
+- **Name Failure Modes**: Explicitly request potential criticisms or blind spots
+- **Iterate for Depth**: Push for non-obvious angles and expert-level insights
 
 ## Security
 
@@ -85,6 +99,10 @@ prompt-optimizer/
 - **Frontend**: Vanilla JavaScript, HTML5, CSS3
 - **Backend**: Vercel Serverless Functions
 - **AI**: Anthropic Claude (Haiku 4.5)
+
+## Credits
+
+This tool is inspired by [Andrej Karpathy's tweet](https://x.com/karpathy/status/1997731268969304070) about the simulator mindset - the insight that LLMs are simulators, not oracles with opinions. By framing prompts to summon specific perspectives, you get dramatically better results.
 
 ## License
 

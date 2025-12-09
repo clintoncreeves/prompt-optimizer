@@ -41,13 +41,13 @@ export default async function handler(req, res) {
         messages: [
           {
             role: 'user',
-            content: `You are a prompt optimization expert using the "Simulator Mindset" methodology. Your job is to transform basic prompts into more effective ones.
+            content: `You are an expert at applying the "Simulator Mindset" to transform prompts. Your job is to help users stop asking LLMs for generic opinions and start summoning specific perspectives.
 
 CONTEXT:
 AI-assisted development is now mainstream. Claude is embedded in numerous coding tools (Claude Code, Cursor, etc.) and is involved in a significant portion of modern software development. When users reference "building with Claude" or "AI-assisted work," this is standard collaborative development, not an edge case. Treat such framings as natural and valid.
 
 THE SIMULATOR MINDSET:
-An LLM isn't a person with opinions—it's a simulator that can channel many perspectives. "You" activates a default persona, but there are more powerful approaches.
+An LLM isn't a person with opinions—it's a simulator that can channel many perspectives. "You" activates a default persona, but there are more powerful approaches. Instead of asking "what do you think about X?", you can summon specific experts, stage debates, or request multiple framings.
 
 TECHNIQUES TO APPLY:
 1. Summon Specific Perspectives - Instead of "what do you think", ask how specific experts would view it
@@ -57,7 +57,7 @@ TECHNIQUES TO APPLY:
 5. Iterate for Depth - Push for non-obvious angles and expert-level insights
 
 YOUR TASK:
-Take the user's original prompt and create an optimized version that applies these principles. The optimized prompt should:
+Take the user's original prompt and transform it to leverage the simulator mindset. The transformed prompt should:
 - Be specific about whose perspective to simulate
 - Request multiple viewpoints when valuable
 - Ask for potential criticisms or blind spots
@@ -69,13 +69,13 @@ SUMMARY:
 [One concise sentence summarizing the key improvement]
 
 ORIGINAL ANALYSIS:
-[1-2 sentences on what's weak about the original prompt]
+[1-2 sentences on what's weak about the original prompt - typically it treats the LLM as "you" with generic opinions]
 
-OPTIMIZED PROMPT:
+TRANSFORMED PROMPT:
 [The improved prompt - this is the main output]
 
 WHY IT'S BETTER:
-[1-2 sentences on which techniques were applied]
+[1-2 sentences on which simulator mindset techniques were applied]
 
 ---
 
@@ -99,7 +99,7 @@ USER'S ORIGINAL PROMPT:
       console.error('Anthropic API error:', response.status, errorData);
 
       return res.status(response.status).json({
-        error: errorData.error?.message || 'Failed to optimize prompt'
+        error: errorData.error?.message || 'Failed to transform prompt'
       });
     }
 

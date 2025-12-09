@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prompt Optimizer | Simulator Mindset</title>
+  <title>The Simulator Mindset | Transform How You Prompt LLMs</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Karla:wght@300;400;500;700&family=Space+Mono:wght@400;700&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&display=swap" rel="stylesheet">
@@ -70,7 +70,7 @@
 
     /* Header */
     header {
-      margin-bottom: 4rem;
+      margin-bottom: 2rem;
       text-align: center;
       animation: fadeSlideDown 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     }
@@ -148,8 +148,8 @@
 
     /* Methodology */
     .methodology {
-      margin-bottom: 3rem;
-      padding: 2rem;
+      margin-bottom: 2rem;
+      padding: 1.5rem;
       background: linear-gradient(135deg, rgba(26, 26, 30, 0.8), rgba(42, 42, 50, 0.6));
       border: 1px solid rgba(255, 107, 53, 0.15);
       border-radius: 16px;
@@ -175,7 +175,7 @@
       letter-spacing: 0.2em;
       text-transform: uppercase;
       color: var(--fog);
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
       display: flex;
       align-items: center;
       gap: 0.75rem;
@@ -571,13 +571,17 @@
 <body>
   <div class="container">
     <header>
-      <div class="overline">Prompt Engineering Tool</div>
-      <h1>Prompt <strong>Optimizer</strong></h1>
-      <p class="subtitle">Transform basic prompts using the simulator mindset methodology</p>
+      <div class="overline">Prompt Engineering Reimagined</div>
+      <h1>The Simulator <strong>Mindset</strong></h1>
+      <p class="subtitle">Stop asking "you" for opinions. Start channeling specific perspectives. LLMs are simulators—summon the experts you actually need.</p>
     </header>
 
     <div class="methodology">
-      <div class="methodology-title">The Simulator Mindset</div>
+      <div class="methodology-title">Core Principles</div>
+      <p style="color: var(--mist); font-size: 0.95rem; line-height: 1.7; margin-bottom: 1rem;">
+        An LLM isn't a person with opinions—it's a simulator that can channel <em>any</em> perspective. 
+        Instead of activating the default "helpful assistant" persona, summon the specific expertise you need.
+      </p>
       <div class="methodology-grid">
         <div class="method-item">
           <h4>Summon Perspectives</h4>
@@ -625,7 +629,7 @@ Example: &quot;What do you think about remote work?&quot;"
               <span>Clear</span>
             </button>
             <button class="btn btn-primary" id="optimizeBtn">
-              <span id="btnText">Optimize Prompt</span>
+              <span id="btnText">Transform Prompt</span>
             </button>
           </div>
         </div>
@@ -636,7 +640,7 @@ Example: &quot;What do you think about remote work?&quot;"
         <div class="card-header">
           <div class="card-title">
             <span class="status-dot green"></span>
-            Optimized Prompt
+            Transformed Prompt
           </div>
           <button class="btn btn-secondary btn-mini" id="copyBtn" style="display: none;">
             <span>Copy</span>
@@ -644,7 +648,7 @@ Example: &quot;What do you think about remote work?&quot;"
         </div>
         <div class="card-body">
           <div class="output-display" id="outputContent">
-            <span class="placeholder">Your optimized prompt will appear here...</span>
+            <span class="placeholder">Your transformed prompt will appear here...</span>
           </div>
         </div>
       </div>
@@ -662,7 +666,7 @@ Example: &quot;What do you think about remote work?&quot;"
         </div>
         <div class="card-body">
           <div class="output-display" id="comparisonContent">
-            <span class="placeholder">Output comparison will appear here after optimization...</span>
+            <span class="placeholder">Output comparison will appear here after transformation...</span>
           </div>
         </div>
       </div>
@@ -670,7 +674,7 @@ Example: &quot;What do you think about remote work?&quot;"
 
     <footer>
       <p class="footer-text">
-        Built on the <a href="#">Simulator Mindset</a> · Inspired by <a href="https://twitter.com/karpathy" target="_blank">@karpathy</a>
+        Inspired by <a href="https://x.com/karpathy/status/1997731268969304070" target="_blank">@karpathy's insight</a> on the simulator mindset
       </p>
     </footer>
   </div>
@@ -710,9 +714,9 @@ Example: &quot;What do you think about remote work?&quot;"
     clearBtn.addEventListener('click', () => {
       inputPrompt.value = '';
       charCount.textContent = '0';
-      outputContent.innerHTML = '<span class="placeholder">Your optimized prompt will appear here...</span>';
+      outputContent.innerHTML = '<span class="placeholder">Your transformed prompt will appear here...</span>';
       outputContent.classList.remove('has-content');
-      comparisonContent.innerHTML = '<span class="placeholder">Output comparison will appear here after optimization...</span>';
+      comparisonContent.innerHTML = '<span class="placeholder">Output comparison will appear here after transformation...</span>';
       comparisonContent.classList.remove('has-content');
       copyBtn.style.display = 'none';
       copyComparisonBtn.style.display = 'none';
@@ -755,9 +759,9 @@ Example: &quot;What do you think about remote work?&quot;"
 
       // Set loading state
       optimizeBtn.disabled = true;
-      btnText.innerHTML = '<span class="spinner"></span> Optimizing...';
-      outputContent.innerHTML = '<div class="loading-state"><span class="spinner"></span> Analyzing and optimizing your prompt...</div>';
-      comparisonContent.innerHTML = '<div class="loading-state"><span class="spinner"></span> Waiting for optimization...</div>';
+      btnText.innerHTML = '<span class="spinner"></span> Transforming...';
+      outputContent.innerHTML = '<div class="loading-state"><span class="spinner"></span> Analyzing your prompt and applying the simulator mindset...</div>';
+      comparisonContent.innerHTML = '<div class="loading-state"><span class="spinner"></span> Waiting for transformation...</div>';
 
       try {
         // Step 1: Optimize the prompt
@@ -822,12 +826,12 @@ Example: &quot;What do you think about remote work?&quot;"
 
       } catch (error) {
         console.error('Error:', error);
-        const errorMessage = error.message || 'Error optimizing prompt. Please try again.';
+        const errorMessage = error.message || 'Error transforming prompt. Please try again.';
         outputContent.innerHTML = `<span class="placeholder" style="color: var(--spark);">${escapeHtml(errorMessage)}</span>`;
         comparisonContent.innerHTML = `<span class="placeholder" style="color: var(--spark);">Comparison unavailable due to error.</span>`;
       } finally {
         optimizeBtn.disabled = false;
-        btnText.textContent = 'Optimize Prompt';
+        btnText.textContent = 'Transform Prompt';
       }
     });
 
@@ -861,7 +865,7 @@ Example: &quot;What do you think about remote work?&quot;"
   <div class="section-text">${escapeHtml(sections.analysis)}</div>
 </div>
 <div class="content-section">
-  <span class="section-label success">Optimized Prompt</span>
+  <span class="section-label success">Transformed Prompt</span>
   <div class="section-text">${escapeHtml(sections.optimized)}</div>
 </div>
 <div class="content-section">
@@ -886,11 +890,11 @@ ${data.tldr ? `<div class="content-section">
   <div class="section-text">${escapeHtml(data.originalOutput)}</div>
 </div>
 <div class="content-section">
-  <span class="section-label success">Optimized Prompt Output</span>
+  <span class="section-label success">Transformed Prompt Output</span>
   <div class="section-text">${escapeHtml(data.optimizedOutput)}</div>
 </div>
 <div class="content-section">
-  <span class="section-label info">Why the optimized output is better</span>
+  <span class="section-label info">Why the transformed output is better</span>
   <div class="section-text">${escapeHtml(data.analysis)}</div>
 </div>
       `;
