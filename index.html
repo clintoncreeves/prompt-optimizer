@@ -524,6 +524,184 @@
       opacity: 1;
     }
 
+    /* Sim Character */
+    .sim-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.5rem;
+      opacity: 0;
+      transform: translateY(20px);
+      pointer-events: none;
+      z-index: 50;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .sim-container.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: all;
+    }
+
+    .sim-character {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--charcoal), var(--slate));
+      border: 2px solid var(--spark);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      animation: simBob 2s ease-in-out infinite;
+    }
+
+    .sim-face {
+      font-size: 1.5rem;
+      animation: simFacePop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .sim-message {
+      background: rgba(26, 26, 30, 0.95);
+      border: 1px solid rgba(255, 107, 53, 0.3);
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--pearl);
+      white-space: nowrap;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    @keyframes simBob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+
+    @keyframes simFacePop {
+      0% { transform: scale(0); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    /* Sim Intro Prompt */
+    .sim-intro {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+      pointer-events: none;
+      z-index: 100;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .sim-intro.show {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: all;
+    }
+
+    .sim-intro-content {
+      background: linear-gradient(135deg, var(--charcoal), var(--slate));
+      border: 2px solid var(--spark);
+      border-radius: 12px;
+      padding: 1rem;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+      max-width: 280px;
+    }
+
+    .sim-intro-character {
+      font-size: 2rem;
+      text-align: center;
+      margin-bottom: 0.5rem;
+      animation: simBob 2s ease-in-out infinite;
+    }
+
+    .sim-intro-text {
+      font-family: 'Karla', sans-serif;
+      font-size: 0.9rem;
+      color: var(--pearl);
+      text-align: center;
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+
+    .sim-intro-text strong {
+      color: var(--spark);
+    }
+
+    .sim-intro-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-sim-intro {
+      flex: 1;
+      padding: 0.6rem 1rem;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Karla', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: var(--spark);
+      color: var(--night);
+    }
+
+    .btn-sim-intro:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+    }
+
+    .btn-sim-intro.secondary {
+      background: rgba(42, 42, 50, 0.8);
+      color: var(--mist);
+      border: 1px solid rgba(138, 138, 149, 0.3);
+    }
+
+    .btn-sim-intro.secondary:hover {
+      background: rgba(42, 42, 50, 1);
+      color: var(--pearl);
+    }
+
+    /* Sim Toggle Button */
+    .sim-toggle {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      width: 40px;
+      height: 40px;
+      border: 2px solid rgba(138, 138, 149, 0.3);
+      border-radius: 10px;
+      background: rgba(26, 26, 30, 0.8);
+      font-size: 1.25rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      z-index: 10;
+      display: none;
+    }
+
+    .sim-toggle.visible {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sim-toggle.enabled {
+      border-color: var(--spark);
+      background: rgba(255, 107, 53, 0.1);
+    }
+
+    .sim-toggle:hover {
+      transform: translateY(-2px);
+      border-color: var(--spark);
+    }
+
     /* Footer */
     footer {
       margin-top: 4rem;
@@ -565,6 +743,50 @@
 
       .btn {
         width: 100%;
+      }
+
+      /* Sim mobile adjustments */
+      .sim-container {
+        bottom: 16px;
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%) translateY(20px);
+        align-items: center;
+      }
+
+      .sim-container.show {
+        transform: translateX(-50%) translateY(0);
+      }
+
+      .sim-character {
+        width: 40px;
+        height: 40px;
+      }
+
+      .sim-face {
+        font-size: 1.25rem;
+      }
+
+      .sim-message {
+        font-size: 0.7rem;
+      }
+
+      .sim-intro {
+        bottom: 16px;
+        left: 16px;
+        right: 16px;
+      }
+
+      .sim-intro-content {
+        max-width: 100%;
+      }
+
+      .sim-toggle {
+        top: 1rem;
+        right: 1rem;
+        width: 36px;
+        height: 36px;
+        font-size: 1.1rem;
       }
     }
   </style>
@@ -674,6 +896,33 @@ Example: &quot;What do you think about remote work?&quot;"
 
   <div class="toast" id="toast">Copied to clipboard!</div>
 
+  <!-- Sim Character -->
+  <div class="sim-container" id="simContainer">
+    <div class="sim-character">
+      <div class="sim-face" id="simFace">✨</div>
+    </div>
+    <div class="sim-message" id="simMessage">Transformation complete!</div>
+  </div>
+
+  <!-- Sim Intro Prompt -->
+  <div class="sim-intro" id="simIntro">
+    <div class="sim-intro-content">
+      <div class="sim-intro-character">👾</div>
+      <div class="sim-intro-text">
+        <strong>Nice work!</strong> Want a companion?
+      </div>
+      <div class="sim-intro-actions">
+        <button class="btn-sim-intro" id="simIntroYes">Meet Sim</button>
+        <button class="btn-sim-intro secondary" id="simIntroNo">Maybe later</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sim Toggle Button -->
+  <button class="sim-toggle" id="simToggle" title="Toggle Sim companion">
+    👾
+  </button>
+
   <script>
     const inputPrompt = document.getElementById('inputPrompt');
     const outputContent = document.getElementById('outputContent');
@@ -689,6 +938,109 @@ Example: &quot;What do you think about remote work?&quot;"
     let optimizedText = '';
     let optimizedPromptText = '';
     let comparisonData = null;
+
+    // Sim Character System
+    const simContainer = document.getElementById('simContainer');
+    const simFace = document.getElementById('simFace');
+    const simMessage = document.getElementById('simMessage');
+    const simIntro = document.getElementById('simIntro');
+    const simIntroYes = document.getElementById('simIntroYes');
+    const simIntroNo = document.getElementById('simIntroNo');
+    const simToggle = document.getElementById('simToggle');
+
+    let simEnabled = localStorage.getItem('simEnabled') === 'true';
+    let simIntroShown = localStorage.getItem('simIntroShown') === 'true';
+    let transformCount = parseInt(localStorage.getItem('transformCount') || '0');
+
+    // Initialize Sim toggle button
+    if (simIntroShown) {
+      simToggle.classList.add('visible');
+      if (simEnabled) {
+        simToggle.classList.add('enabled');
+      }
+    }
+
+    // Sim toggle
+    simToggle.addEventListener('click', () => {
+      simEnabled = !simEnabled;
+      localStorage.setItem('simEnabled', simEnabled);
+      simToggle.classList.toggle('enabled', simEnabled);
+
+      if (simEnabled) {
+        showSim('✨', 'Sim is back!');
+      }
+    });
+
+    // Sim intro handlers
+    simIntroYes.addEventListener('click', () => {
+      simEnabled = true;
+      simIntroShown = true;
+      localStorage.setItem('simEnabled', 'true');
+      localStorage.setItem('simIntroShown', 'true');
+      simIntro.classList.remove('show');
+      simToggle.classList.add('visible', 'enabled');
+      setTimeout(() => showSim('✨', 'Great! I\'ll celebrate your wins!'), 400);
+    });
+
+    simIntroNo.addEventListener('click', () => {
+      transformCount = 0; // Reset count to ask again later
+      localStorage.setItem('transformCount', '0');
+      simIntro.classList.remove('show');
+    });
+
+    function detectTechnique(transformedPrompt) {
+      const lower = transformedPrompt.toLowerCase();
+
+      // Check for debate/multiple perspectives
+      if (lower.includes('debate') || lower.includes('argue') || lower.includes('advocate') || lower.includes('critic')) {
+        return { emoji: '⚖️', message: 'Nice debate structure!' };
+      }
+
+      // Check for specific perspectives
+      if (lower.includes('as a ') || lower.includes('perspective of') || lower.includes('expert') || lower.includes('viewpoint')) {
+        return { emoji: '🔮', message: 'Specific perspectives summoned!' };
+      }
+
+      // Check for critical thinking/failure modes
+      if (lower.includes('skeptic') || lower.includes('critic') || lower.includes('fail') || lower.includes('flaw') || lower.includes('risk') || lower.includes('problem')) {
+        return { emoji: '🧠', message: 'Good critical thinking!' };
+      }
+
+      // Default
+      return { emoji: '✨', message: 'Transformation complete!' };
+    }
+
+    function showSim(emoji, message) {
+      if (!simEnabled) return;
+
+      simFace.textContent = emoji;
+      simMessage.textContent = message;
+      simContainer.classList.add('show');
+
+      // Auto-hide after 3 seconds
+      setTimeout(() => {
+        simContainer.classList.remove('show');
+      }, 3000);
+    }
+
+    function checkSimIntro() {
+      transformCount++;
+      localStorage.setItem('transformCount', transformCount.toString());
+
+      // Show intro after first transformation
+      if (transformCount === 1 && !simIntroShown) {
+        setTimeout(() => {
+          simIntro.classList.add('show');
+        }, 1000);
+      }
+
+      // Ask again after 3 transformations if they said "maybe later"
+      if (transformCount === 4 && !simIntroShown) {
+        setTimeout(() => {
+          simIntro.classList.add('show');
+        }, 1000);
+      }
+    }
 
     // Character count
     inputPrompt.addEventListener('input', () => {
@@ -816,6 +1168,11 @@ Example: &quot;What do you think about remote work?&quot;"
         comparisonContent.innerHTML = formatComparison(comparisonData);
         comparisonContent.classList.add('has-content');
         copyComparisonBtn.style.display = 'block';
+
+        // Sim celebration
+        checkSimIntro();
+        const technique = detectTechnique(optimizedPromptText);
+        showSim(technique.emoji, technique.message);
 
       } catch (error) {
         console.error('Error:', error);
