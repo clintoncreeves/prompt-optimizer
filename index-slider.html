@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Simulator Mindset | Transform How You Prompt LLMs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Karla:wght@300;400;500;700&family=Space+Mono:wght@400;700&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --night: #0d0d0f;
+      --charcoal: #1a1a1e;
+      --slate: #2a2a32;
+      --fog: #8a8a95;
+      --mist: #c5c5d0;
+      --pearl: #f5f5f7;
+      --spark: #ff6b35;
+      --ember: #ff8c61;
+      --sage: #5dba89;
+      --lavender: #a78bfa;
+      --azure: #4f90f2;
+      --ruby: #ef4444;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Karla', sans-serif;
+      background: var(--night);
+      color: var(--pearl);
+      line-height: 1.65;
+      min-height: 100vh;
+      padding: 2rem 1.5rem;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: 
+        radial-gradient(circle at 20% 20%, rgba(255, 107, 53, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(167, 139, 250, 0.06) 0%, transparent 50%);
+      animation: drift 60s ease-in-out infinite;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    @keyframes drift {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      50% { transform: translate(-3%, 3%) rotate(0.5deg); }
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header */
+    header {
+      margin-bottom: 2rem;
+      text-align: center;
+      animation: fadeSlideDown 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes fadeSlideDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .overline {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--spark);
+      margin-bottom: 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 1rem;
+      font-weight: 700;
+    }
+
+    .overline::before,
+    .overline::after {
+      content: '';
+      width: 24px;
+      height: 1px;
+      background: var(--spark);
+      opacity: 0.5;
+    }
+
+    h1 {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 300;
+      line-height: 1;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.03em;
+    }
+
+    h1 strong {
+      font-weight: 600;
+      font-style: italic;
+      color: var(--spark);
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      color: var(--mist);
+      font-weight: 300;
+      max-width: 700px;
+      margin: 0 auto 1.5rem;
+      line-height: 1.6;
+    }
+
+    /* Help Toggle */
+    .help-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: rgba(255, 107, 53, 0.1);
+      border: 1px solid rgba(255, 107, 53, 0.3);
+      border-radius: 8px;
+      color: var(--spark);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .help-toggle:hover {
+      background: rgba(255, 107, 53, 0.15);
+      transform: translateY(-1px);
+    }
+
+    .help-icon {
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--spark);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+
+    /* Core Principles Overlay */
+    .principles-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(13, 13, 15, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .principles-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .principles-content {
+      max-width: 900px;
+      background: linear-gradient(135deg, rgba(26, 26, 30, 0.9), rgba(42, 42, 50, 0.7));
+      border: 1px solid rgba(255, 107, 53, 0.2);
+      border-radius: 20px;
+      padding: 2.5rem;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .close-overlay {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: rgba(255, 107, 53, 0.2);
+      color: var(--spark);
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.25rem;
+      line-height: 1;
+      transition: all 0.3s ease;
+    }
+
+    .close-overlay:hover {
+      background: rgba(255, 107, 53, 0.3);
+      transform: rotate(90deg);
+    }
+
+    .principles-title {
+      font-family: 'Fraunces', serif;
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: var(--spark);
+      margin-bottom: 1rem;
+    }
+
+    .principles-intro {
+      color: var(--mist);
+      font-size: 1rem;
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+
+    .principles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .principle-card {
+      padding: 1.25rem;
+      background: rgba(13, 13, 15, 0.5);
+      border-radius: 12px;
+      border-left: 3px solid var(--spark);
+      transition: all 0.3s ease;
+    }
+
+    .principle-card:hover {
+      transform: translateX(4px);
+      background: rgba(255, 107, 53, 0.05);
+    }
+
+    .principle-card h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--pearl);
+    }
+
+    .principle-card p {
+      font-size: 0.85rem;
+      color: var(--fog);
+      line-height: 1.5;
+    }
+
+    /* Input Section */
+    .input-section {
+      margin-bottom: 2rem;
+      animation: fadeSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s backwards;
+    }
+
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .input-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+
+    .input-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--fog);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--azure);
+      box-shadow: 0 0 12px rgba(79, 144, 242, 0.6);
+    }
+
+    .char-count {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--fog);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 140px;
+      background: rgba(26, 26, 30, 0.8);
+      border: 2px solid rgba(138, 138, 149, 0.2);
+      border-radius: 12px;
+      padding: 1.25rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.9rem;
+      color: var(--pearl);
+      resize: vertical;
+      transition: all 0.3s ease;
+      line-height: 1.6;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--spark);
+      background: rgba(26, 26, 30, 0.95);
+      box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+    }
+
+    textarea::placeholder {
+      color: var(--fog);
+      opacity: 0.5;
+    }
+
+    /* Action Bar */
+    .action-bar {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .btn {
+      font-family: 'Karla', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 0.875rem 1.75rem;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      border: none;
+      letter-spacing: 0.01em;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--spark), var(--ember));
+      color: white;
+      flex: 1;
+      box-shadow: 0 4px 16px rgba(255, 107, 53, 0.3);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: rgba(42, 42, 50, 0.8);
+      color: var(--mist);
+      border: 2px solid rgba(138, 138, 149, 0.3);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(42, 42, 50, 1);
+      border-color: var(--spark);
+      color: var(--pearl);
+    }
+
+    /* Comparison Canvas */
+    .comparison-canvas {
+      position: relative;
+      background: linear-gradient(135deg, rgba(26, 26, 30, 0.9), rgba(42, 42, 50, 0.7));
+      border: 1px solid rgba(138, 138, 149, 0.2);
+      border-radius: 16px;
+      overflow: hidden;
+      min-height: 500px;
+      margin-bottom: 2rem;
+      animation: fadeSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s backwards;
+      display: none;
+    }
+
+    .comparison-canvas.active {
+      display: block;
+    }
+
+    .canvas-container {
+      position: relative;
+      height: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    /* Sides */
+    .canvas-side {
+      padding: 2rem;
+      overflow-y: auto;
+      max-height: 600px;
+    }
+
+    .canvas-side.left {
+      border-right: 1px solid rgba(138, 138, 149, 0.2);
+    }
+
+    .side-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    .side-badge.original {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: var(--ruby);
+    }
+
+    .side-badge.transformed {
+      background: rgba(93, 186, 137, 0.1);
+      border: 1px solid rgba(93, 186, 137, 0.3);
+      color: var(--sage);
+    }
+
+    .prompt-display {
+      background: rgba(13, 13, 15, 0.6);
+      border: 1px solid rgba(138, 138, 149, 0.2);
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.85rem;
+      line-height: 1.7;
+      color: var(--mist);
+    }
+
+    .prompt-display.highlight {
+      animation: highlightPulse 1.5s ease-out;
+    }
+
+    @keyframes highlightPulse {
+      0%, 100% { border-color: rgba(138, 138, 149, 0.2); }
+      50% { border-color: var(--sage); box-shadow: 0 0 20px rgba(93, 186, 137, 0.3); }
+    }
+
+    .output-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--fog);
+      margin-bottom: 0.5rem;
+    }
+
+    .output-display {
+      background: rgba(13, 13, 15, 0.8);
+      border: 1px solid rgba(138, 138, 149, 0.15);
+      border-radius: 10px;
+      padding: 1rem;
+      font-family: 'Karla', sans-serif;
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: var(--pearl);
+    }
+
+    /* Slider */
+    .slider-container {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 60px;
+      margin-left: -30px;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .slider-track {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      background: linear-gradient(180deg, var(--ruby), var(--sage));
+      transform: translateX(-50%);
+    }
+
+    .slider-handle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 48px;
+      height: 48px;
+      background: var(--charcoal);
+      border: 2px solid var(--spark);
+      border-radius: 50%;
+      cursor: ew-resize;
+      pointer-events: all;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      transition: transform 0.2s ease;
+    }
+
+    .slider-handle:hover {
+      transform: translate(-50%, -50%) scale(1.1);
+      box-shadow: 0 6px 20px rgba(255, 107, 53, 0.5);
+    }
+
+    .slider-handle::before {
+      content: '⇄';
+      font-size: 1.25rem;
+      color: var(--spark);
+    }
+
+    .slider-label {
+      position: absolute;
+      top: -2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 0.35rem 0.75rem;
+      background: rgba(13, 13, 15, 0.95);
+      border: 1px solid rgba(255, 107, 53, 0.3);
+      border-radius: 6px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 700;
+      white-space: nowrap;
+      color: var(--spark);
+      letter-spacing: 0.05em;
+    }
+
+    /* Why Section */
+    .why-section {
+      background: rgba(26, 26, 30, 0.6);
+      border: 1px solid rgba(93, 186, 137, 0.2);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      animation: fadeSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.6s backwards;
+      display: none;
+    }
+
+    .why-section.active {
+      display: block;
+    }
+
+    .why-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      cursor: pointer;
+    }
+
+    .why-title {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--sage);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .why-toggle {
+      font-size: 0.8rem;
+      color: var(--fog);
+      transition: transform 0.3s ease;
+    }
+
+    .why-section.collapsed .why-toggle {
+      transform: rotate(-90deg);
+    }
+
+    .why-section.collapsed .why-content {
+      display: none;
+    }
+
+    .why-content {
+      color: var(--mist);
+      font-size: 0.9rem;
+      line-height: 1.7;
+    }
+
+    .why-item {
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid rgba(138, 138, 149, 0.1);
+    }
+
+    .why-item:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .why-label {
+      font-weight: 700;
+      color: var(--sage);
+      margin-bottom: 0.25rem;
+    }
+
+    /* Loading State */
+    .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(13, 13, 15, 0.95);
+      backdrop-filter: blur(5px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      z-index: 20;
+    }
+
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 3px solid rgba(138, 138, 149, 0.2);
+      border-top-color: var(--spark);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--mist);
+      letter-spacing: 0.05em;
+    }
+
+    /* Footer */
+    footer {
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(138, 138, 149, 0.15);
+      text-align: center;
+      animation: fadeSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.8s backwards;
+    }
+
+    .footer-text {
+      font-size: 0.85rem;
+      color: var(--fog);
+      font-family: 'Space Mono', monospace;
+    }
+
+    .footer-text a {
+      color: var(--mist);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .footer-text a:hover {
+      color: var(--spark);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(120px);
+      background: linear-gradient(135deg, var(--sage), #4a9d72);
+      color: white;
+      padding: 0.875rem 1.5rem;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 1000;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .canvas-container {
+        grid-template-columns: 1fr;
+      }
+
+      .canvas-side.left {
+        border-right: none;
+        border-bottom: 1px solid rgba(138, 138, 149, 0.2);
+      }
+
+      .slider-container {
+        display: none;
+      }
+
+      .principles-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 1.5rem 1rem;
+      }
+
+      .action-bar {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="overline">Prompt Engineering Reimagined</div>
+      <h1>The Simulator <strong>Mindset</strong></h1>
+      <p class="subtitle">Stop asking "you" for opinions. Start channeling specific perspectives. LLMs are simulators—summon the experts you actually need.</p>
+      <button class="help-toggle" onclick="togglePrinciples()">
+        <span class="help-icon">?</span>
+        Core Principles
+      </button>
+    </header>
+
+    <!-- Core Principles Overlay -->
+    <div class="principles-overlay" id="principlesOverlay">
+      <div class="principles-content">
+        <button class="close-overlay" onclick="togglePrinciples()">×</button>
+        <h2 class="principles-title">Core Principles</h2>
+        <p class="principles-intro">
+          An LLM isn't a person with opinions—it's a simulator that can channel <em>any</em> perspective. 
+          Instead of activating the default "helpful assistant" persona, summon the specific expertise you need.
+        </p>
+        <div class="principles-grid">
+          <div class="principle-card">
+            <h4>Summon Perspectives</h4>
+            <p>Ask how specific experts would view the problem</p>
+          </div>
+          <div class="principle-card">
+            <h4>Stage Debates</h4>
+            <p>Simulate conversations between advocates and critics</p>
+          </div>
+          <div class="principle-card">
+            <h4>Multiple Framings</h4>
+            <p>Request explanations for different audiences</p>
+          </div>
+          <div class="principle-card">
+            <h4>Name Failure Modes</h4>
+            <p>Ask what skeptics or auditors would flag</p>
+          </div>
+          <div class="principle-card">
+            <h4>Iterate When Flat</h4>
+            <p>Push for non-obvious angles and expert insights</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input Section -->
+    <div class="input-section">
+      <div class="input-header">
+        <div class="input-label">
+          <span class="status-dot"></span>
+          Your Prompt
+        </div>
+        <span class="char-count"><span id="charCount">0</span> chars</span>
+      </div>
+      <textarea 
+        id="inputPrompt" 
+        placeholder="Enter your prompt here...
+
+Example: &quot;What do you think about remote work?&quot;"
+      ></textarea>
+      
+      <div class="action-bar">
+        <button class="btn btn-secondary" id="clearBtn">Clear</button>
+        <button class="btn btn-primary" id="transformBtn">
+          <span id="btnText">Transform Prompt</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Comparison Canvas -->
+    <div class="comparison-canvas" id="comparisonCanvas">
+      <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text">Applying simulator mindset...</div>
+      </div>
+      
+      <div class="canvas-container">
+        <!-- Left Side: Original -->
+        <div class="canvas-side left">
+          <div class="side-badge original">❌ Generic Assistant Mode</div>
+          <div class="prompt-display" id="originalPrompt"></div>
+          <div class="output-label">Output</div>
+          <div class="output-display" id="originalOutput">Waiting for transformation...</div>
+        </div>
+
+        <!-- Right Side: Transformed -->
+        <div class="canvas-side">
+          <div class="side-badge transformed">✓ Simulator Mindset Active</div>
+          <div class="prompt-display highlight" id="transformedPrompt"></div>
+          <div class="output-label">Output</div>
+          <div class="output-display" id="transformedOutput">Waiting for transformation...</div>
+        </div>
+      </div>
+
+      <!-- Slider (desktop only) -->
+      <div class="slider-container">
+        <div class="slider-track"></div>
+        <div class="slider-handle">
+          <div class="slider-label">Drag to Compare</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Why It Works Section -->
+    <div class="why-section" id="whySection">
+      <div class="why-header" onclick="toggleWhy()">
+        <div class="why-title">
+          <span>💡</span>
+          Why This Works Better
+        </div>
+        <div class="why-toggle">▼</div>
+      </div>
+      <div class="why-content" id="whyContent"></div>
+    </div>
+
+    <footer>
+      <p class="footer-text">
+        Inspired by <a href="https://x.com/karpathy/status/1997731268969304070" target="_blank">@karpathy's insight</a> on the simulator mindset
+      </p>
+    </footer>
+  </div>
+
+  <div class="toast" id="toast">Copied to clipboard!</div>
+
+  <script>
+    const inputPrompt = document.getElementById('inputPrompt');
+    const charCount = document.getElementById('charCount');
+    const transformBtn = document.getElementById('transformBtn');
+    const btnText = document.getElementById('btnText');
+    const clearBtn = document.getElementById('clearBtn');
+    const comparisonCanvas = document.getElementById('comparisonCanvas');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const whySection = document.getElementById('whySection');
+    const toast = document.getElementById('toast');
+
+    // Character count
+    inputPrompt.addEventListener('input', () => {
+      charCount.textContent = inputPrompt.value.length;
+    });
+
+    // Toggle principles overlay
+    function togglePrinciples() {
+      document.getElementById('principlesOverlay').classList.toggle('active');
+    }
+
+    // Toggle why section
+    function toggleWhy() {
+      document.getElementById('whySection').classList.toggle('collapsed');
+    }
+
+    // Clear button
+    clearBtn.addEventListener('click', () => {
+      inputPrompt.value = '';
+      charCount.textContent = '0';
+      comparisonCanvas.classList.remove('active');
+      whySection.classList.remove('active');
+    });
+
+    // Transform prompt
+    transformBtn.addEventListener('click', async () => {
+      const prompt = inputPrompt.value.trim();
+      
+      if (!prompt) {
+        inputPrompt.focus();
+        return;
+      }
+
+      // Show canvas and loading
+      comparisonCanvas.classList.add('active');
+      loadingOverlay.style.display = 'flex';
+      transformBtn.disabled = true;
+      btnText.textContent = 'Transforming...';
+
+      try {
+        // Step 1: Transform the prompt
+        const transformResponse = await fetch('/api/optimize', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt })
+        });
+
+        // Check if response is JSON
+        const contentType = transformResponse.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new Error('API not available. Make sure you\'re running this on Vercel or with `vercel dev`');
+        }
+
+        const transformData = await transformResponse.json();
+
+        if (!transformResponse.ok) {
+          throw new Error(transformData.error || 'Failed to transform prompt');
+        }
+
+        // Parse transformation
+        const sections = parseResponse(transformData.result);
+        const transformedPrompt = sections.optimized || transformData.result;
+
+        // Display prompts
+        document.getElementById('originalPrompt').textContent = prompt;
+        document.getElementById('transformedPrompt').textContent = transformedPrompt;
+
+        // Step 2: Generate comparison
+        const compareResponse = await fetch('/api/compare', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            originalPrompt: prompt,
+            optimizedPrompt: transformedPrompt
+          })
+        });
+
+        const compareData = await compareResponse.json();
+
+        if (!compareResponse.ok) {
+          throw new Error(compareData.error || 'Failed to generate comparison');
+        }
+
+        // Display outputs
+        document.getElementById('originalOutput').textContent = compareData.originalOutput;
+        document.getElementById('transformedOutput').textContent = compareData.optimizedOutput;
+
+        // Display why section
+        displayWhySection(sections, compareData);
+        
+        // Hide loading
+        loadingOverlay.style.display = 'none';
+        whySection.classList.add('active');
+
+        // Trigger highlight animation
+        setTimeout(() => {
+          document.getElementById('transformedPrompt').classList.add('highlight');
+        }, 100);
+
+      } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('originalOutput').textContent = `Error: ${error.message}`;
+        document.getElementById('transformedOutput').textContent = 'Comparison unavailable due to error.';
+        loadingOverlay.style.display = 'none';
+      } finally {
+        transformBtn.disabled = false;
+        btnText.textContent = 'Transform Prompt';
+      }
+    });
+
+    function parseResponse(text) {
+      const sections = { analysis: '', optimized: '', why: '' };
+      const analysisMatch = text.match(/ORIGINAL ANALYSIS:\s*([\s\S]*?)(?=TRANSFORMED PROMPT:|$)/i);
+      const optimizedMatch = text.match(/(?:TRANSFORMED PROMPT|OPTIMIZED PROMPT):\s*([\s\S]*?)(?=WHY IT'S BETTER:|$)/i);
+      const whyMatch = text.match(/WHY IT'S BETTER:\s*([\s\S]*?)$/i);
+
+      if (analysisMatch) sections.analysis = analysisMatch[1].trim();
+      if (optimizedMatch) sections.optimized = optimizedMatch[1].trim();
+      if (whyMatch) sections.why = whyMatch[1].trim();
+
+      return sections;
+    }
+
+    function displayWhySection(sections, compareData) {
+      const whyContent = document.getElementById('whyContent');
+      let html = '';
+
+      if (sections.analysis) {
+        html += `<div class="why-item"><div class="why-label">Original Weakness:</div>${escapeHtml(sections.analysis)}</div>`;
+      }
+
+      if (sections.why) {
+        html += `<div class="why-item"><div class="why-label">Transformation Applied:</div>${escapeHtml(sections.why)}</div>`;
+      }
+
+      if (compareData.analysis) {
+        html += `<div class="why-item"><div class="why-label">Impact on Output:</div>${escapeHtml(compareData.analysis)}</div>`;
+      }
+
+      whyContent.innerHTML = html;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function showToast() {
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    // Basic slider interaction (simplified for this version)
+    const sliderHandle = document.querySelector('.slider-handle');
+    let isDragging = false;
+
+    if (sliderHandle) {
+      sliderHandle.addEventListener('mousedown', () => isDragging = true);
+      document.addEventListener('mouseup', () => isDragging = false);
+      document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const canvas = document.querySelector('.canvas-container');
+        if (!canvas) return;
+        const rect = canvas.getBoundingClientRect();
+        const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+        const percentage = (x / rect.width) * 100;
+        // Slider visual feedback (actual split-view would require more complex implementation)
+        sliderHandle.style.left = `${percentage}%`;
+      });
+    }
+  </script>
+</body>
+</html>
