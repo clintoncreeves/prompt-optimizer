@@ -844,8 +844,8 @@ Example: &quot;What do you think about remote work?&quot;"
       };
 
       // Extract sections using regex
-      const analysisMatch = text.match(/ORIGINAL ANALYSIS:\s*([\s\S]*?)(?=OPTIMIZED PROMPT:|$)/i);
-      const optimizedMatch = text.match(/OPTIMIZED PROMPT:\s*([\s\S]*?)(?=WHY IT'S BETTER:|$)/i);
+      const analysisMatch = text.match(/ORIGINAL ANALYSIS:\s*([\s\S]*?)(?=TRANSFORMED PROMPT:|$)/i);
+      const optimizedMatch = text.match(/TRANSFORMED PROMPT:\s*([\s\S]*?)(?=WHY IT'S BETTER:|$)/i);
       const whyMatch = text.match(/WHY IT'S BETTER:\s*([\s\S]*?)$/i);
 
       if (analysisMatch) sections.analysis = analysisMatch[1].trim();
